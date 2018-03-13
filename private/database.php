@@ -10,7 +10,7 @@
     */
     
 
-    $connectstr_dbname = 'MockEbay';
+    $connectstr_dbname = 'localdb';
     $connectstr_dbhost = '';
     $connectstr_dbusername = '';
     $connectstr_dbpassword = '';
