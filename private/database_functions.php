@@ -144,14 +144,14 @@
 				return true;
 			} else {
 				// username exist, but password not
-				echo "<script>alert('Wrong password and/or username. Try again.'); window.location.href='../public/login.php';</script>";
+				echo "<script>alert('Wrong password and/or username. Try again.'); window.location.href='../public/index.php';</script>";
 				echo mysqli_error($db);
 				db_disconnect($db);
 				exit;
 			}
 		} else {
 			//neither password nor username correct
-				echo "<script>alert('Wrong password and/or username. Try again.'); window.location.href='../public/login.php';</script>";
+				echo "<script>alert('Wrong password and/or username. Try again.'); window.location.href='../public/index.php';</script>";
 				echo mysqli_error($db);
 				db_disconnect($db);
 				exit;
