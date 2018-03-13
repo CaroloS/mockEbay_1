@@ -52,7 +52,7 @@
 
 	function require_login() {
 		if(!is_logged_in()) {
-		    $location = 'login.php';
+		    $location = 'index.php';
         	header("Location: " . $location);
         	exit();
 	} else {

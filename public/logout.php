@@ -3,7 +3,7 @@
 include_once('../private/initialise.php');
 
 	user_logout();
-	$location = 'login.php';
+	$location = 'index.php';
 	header("Location: " . $location);
 	exit();
 
