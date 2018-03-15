@@ -3,27 +3,15 @@
   require_once('db_credentials.php');
 
   function db_connect() {
-    
-  #$connection = mysqli_connect(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
-  #confirm_db_connect();
-  #return $connection;
-
-
-
-
-  $connection = mysqli_init(); 
-  mysqli_ssl_set($connection, NULL, NULL, NULL, NULL, NULL); 
-  mysqli_real_connect($connection, DB_SERVER, DB_USER, DB_PASS, DB_NAME, 3306);
+  
+  /*
+  $connection = mysqli_connect(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
   confirm_db_connect();
   return $connection;
+*/
 
 
-
-
-
-    
-/*
-    $connectstr_dbname = 'MockEbay';
+    $connectstr_dbname = 'localdb';
     $connectstr_dbhost = '';
     $connectstr_dbusername = '';
     $connectstr_dbpassword = '';
@@ -55,6 +43,17 @@
 
     //confirm_db_connect();
     return $connection;
+
+
+
+
+/*
+
+  $connection = mysqli_init(); 
+  mysqli_ssl_set($connection, NULL, NULL, NULL, NULL, NULL); 
+  mysqli_real_connect($connection, DB_SERVER, DB_USER, DB_PASS, DB_NAME, 3306);
+  confirm_db_connect();
+  return $connection;
 */
     
   }
