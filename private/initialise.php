@@ -2,6 +2,8 @@
 
 	ob_start(); //output buffering turned on
 
+	session_save_path ("C:\Temp" );
+
 	session_start();
 
   	require_once('database.php');
