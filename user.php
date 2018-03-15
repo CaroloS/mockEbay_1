@@ -22,7 +22,7 @@
         $result = insert_user($user);
 
             if ($result === true) {
-                $location = 'login.php';
+                $location = 'index.php';
                 header("Location: " . $location);
                 exit();
             } else {

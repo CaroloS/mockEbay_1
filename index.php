@@ -118,7 +118,7 @@
                             </h2>
                         </div>
                         <div class="card-body">
-                            <form action="<?php echo "login.php"; ?>" method="post">
+                            <form action="<?php echo "index.php"; ?>" method="post">
                                 <div class="form-group">
                                     <label for="sender-email" class="control-label">Username: <sup>*</sup></label>
 
