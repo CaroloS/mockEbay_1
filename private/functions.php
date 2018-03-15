@@ -1,6 +1,6 @@
 <?php
 
-	include_once('../private/initialise.php');
+	include_once('initialise.php');
 
 	function redirect_to($location) {
  		header("Location: " . $location);
