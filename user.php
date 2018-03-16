@@ -116,7 +116,7 @@
     <div class="main-container">
         <div class="container">
 
-            <?php echo display_errors($errors); ?>
+       
 
             <div class="row">
                 <div class="col-md-8 page-content">
