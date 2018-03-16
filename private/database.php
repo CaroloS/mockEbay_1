@@ -17,9 +17,6 @@
   $connection = mysqli_init();
   mysqli_real_connect($connection, $host, $username, $password, $db_name, 3306);
 
-  //if (mysqli_connect_errno($conn)) {
-  //die('Failed to connect to MySQL: '.mysqli_connect_error());
-
   return $connection;
 
 /*
@@ -30,10 +27,6 @@
   return $connection;
 
 */
-
-
-
-    
 /*
     $connectstr_dbname = 'MockEbay';
     $connectstr_dbhost = '';

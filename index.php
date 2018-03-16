@@ -9,6 +9,8 @@
 
       $result = user_login($login);
 
+  //  $result = true;
+     
       if($result === true) {
         user_session($login);
             if ($_SESSION['description'] === 'Customer') {
