@@ -2,7 +2,7 @@
 	include_once('initialise.php');
 	
 	function user_session($login) {
-		session_regenerate_id();
+	//	session_regenerate_id();
 
 		$_SESSION['username'] = $login['username'];
 

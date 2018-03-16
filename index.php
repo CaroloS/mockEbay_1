@@ -8,7 +8,7 @@
       $login['password'] = $_POST['password'];
 
     //  $result = user_login($login);
-
+        
     $result = true;
      
       if($result === true) {
