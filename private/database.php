@@ -3,18 +3,43 @@
   require_once('db_credentials.php');
 
   function db_connect() {
+    
+  #$connection = mysqli_connect(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
+  #confirm_db_connect();
+  #return $connection;
+
+  $host = 'mockebay.mysql.database.azure.com';
+  $username = 'webuser@mockebay';
+  $password = 'Pa55word!';
+  $db_name = 'mockebay';
   
-  /*
-  $connection = mysqli_connect(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
+  //Establishes the connection
+  $connection = mysqli_init();
+  mysqli_real_connect($connection, $host, $username, $password, $db_name, 3306);
+
+  //if (mysqli_connect_errno($conn)) {
+  //die('Failed to connect to MySQL: '.mysqli_connect_error());
+
   confirm_db_connect();
   return $connection;
+
+/*
+  $connection = mysqli_init(); 
+  mysqli_ssl_set($connection, NULL, NULL, NULL, NULL, NULL); 
+  mysqli_real_connect($connection, DB_SERVER, DB_USER, DB_PASS, DB_NAME, 3306);
+  confirm_db_connect();
+  return $connection;
+
 */
 
 
-    $connectstr_dbname = 'localdb';
-    $connectstr_dbhost = 'cs2018mar15phpdb.mysql.database.azure.com';
-    $connectstr_dbusername = 'caroilne';
-    $connectstr_dbpassword = 'CarolinaPa$w0rd!';
+
+    
+/*
+    $connectstr_dbname = 'MockEbay';
+    $connectstr_dbhost = '';
+    $connectstr_dbusername = '';
+    $connectstr_dbpassword = '';
 	 
     foreach ($_SERVER as $key => $value) {
       if (strpos($key, "MYSQLCONNSTR_localdb") !== 0) {
@@ -43,17 +68,6 @@
 
     //confirm_db_connect();
     return $connection;
-
-
-
-
-/*
-
-  $connection = mysqli_init(); 
-  mysqli_ssl_set($connection, NULL, NULL, NULL, NULL, NULL); 
-  mysqli_real_connect($connection, DB_SERVER, DB_USER, DB_PASS, DB_NAME, 3306);
-  confirm_db_connect();
-  return $connection;
 */
     
   }

@@ -1,7 +1,7 @@
 <?php 
-	define("DB_SERVER", "localhost");
-	define("DB_USER", "caroline");
-	define("DB_PASS", "ebay123");
+	define("DB_SERVER", "mockebay.mysql.database.azure.com");
+	define("DB_USER", "webuser@mockebay");
+	define("DB_PASS", "Pa55word!");
 	define("DB_NAME", "mockebay");
 
 
