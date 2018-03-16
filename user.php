@@ -1,6 +1,6 @@
 <?php include_once('private/initialise.php'); 
 
-   // $country = find_all_countries();
+    $country = find_all_countries();
 
 
     if(is_post_request()) {
