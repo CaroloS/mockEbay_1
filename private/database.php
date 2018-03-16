@@ -12,9 +12,9 @@
 
 
     $connectstr_dbname = 'localdb';
-    $connectstr_dbhost = '';
-    $connectstr_dbusername = '';
-    $connectstr_dbpassword = '';
+    $connectstr_dbhost = 'cs2018mar15phpdb.mysql.database.azure.com';
+    $connectstr_dbusername = 'caroilne';
+    $connectstr_dbpassword = 'CarolinaPa$w0rd!';
 	 
     foreach ($_SERVER as $key => $value) {
       if (strpos($key, "MYSQLCONNSTR_localdb") !== 0) {
