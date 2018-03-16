@@ -4,7 +4,7 @@
 
 	//session_save_path ("C:\Temp" );
 
-	session_start();
+	//session_start();
 
   	require_once('database.php');
   	require_once('database_functions.php');
