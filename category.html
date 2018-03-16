@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+    <title>Edatabay Main</title>
+    <!-- Bootstrap core CSS -->
+    <link href="assets/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <!-- styles needed for carousel slider -->
+    <link href="assets/plugins/owl-carousel/owl.carousel.css" rel="stylesheet">
+    <link href="assets/plugins/owl-carousel/owl.theme.css" rel="stylesheet">
+
+    <!-- bxSlider CSS file -->
+    <link href="assets/plugins/bxslider/jquery.bxslider.css" rel="stylesheet"/>
+
+    <!-- Just for debugging purposes. -->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- include pace script for automatic web page progress bar  -->
+    <script>
+        paceOptions = {
+            elements: true
+        };
+    </script>
+    <script src="assets/js/pace.min.js"></script>
+
+
+</head>
+<body>
+
+<div id="wrapper">
+
+    <div class="header">
+        <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
+             role="navigation">
+            <div class="container">
+
+            <div class="navbar-identity">
+
+
+            <img src="images/edatabay.png" alt="companyLogo">
+
+
+                <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggler pull-right"
+                        type="button">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 30 30" width="30" height="30" focusable="false"><title>Menu</title><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"/></svg>
+
+
+                </button>
+
+
+                <button
+                        class="flag-menu country-flag d-block d-md-none btn btn-secondary hidden pull-right"
+                        href="#select-country" data-toggle="modal"> <span class="flag-icon flag-icon-us"></span>  <span class="caret"></span>
+                </button>
+
+            </div>
+
+
+
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-left">
+                        
+                    </ul>
+                    <ul class="nav navbar-nav ml-auto navbar-right">
+                        <li class="nav-item"><a href="category.html" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
+                        </li>
+                        <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+
+                            <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
+                            <ul
+                                    class="dropdown-menu user-menu dropdown-menu-right">
+                                <li class="active dropdown-item"><a href="account-home.html"><i class="icon-home"></i> Personal Home
+
+                                </a>
+                                </li>
+                                <li class="dropdown-item"><a href="account-myads.html"><i class="icon-th-thumb"></i> My Listings </a>
+                                </li>
+                                <li class="dropdown-item"><a href="account-favourite-ads.html"><i class="icon-heart"></i> Watchlist </a>
+                                </li>
+                                
+                                <li class="dropdown-item"><a href="account-pending-approval-ads.html"><i class="icon-hourglass"></i> Bids/Purchases </a>
+                                </li>
+                                
+                                <li class="dropdown-item"><a href="login.html"><i class=" icon-logout "></i> Log out </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="postadd nav-item"><a class="btn btn-block   btn-border btn-post btn-danger nav-link" href="post-ads.html">LIST AN ITEM</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                <!--/.nav-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+    </div>
+        <!-- /.header -->
+
+        <div class="search-row-wrapper" >
+        	<div class="container " >
+        		<form action="#" method="GET">
+        			<div class="row">
+
+
+        				<div class="col-md-4">
+        					<input class="form-control keyword" type="text" placeholder="e.g. Phone">
+        				</div>
+        				<div class="col-md-4">
+        					<select class="form-control selecter" name="category" id="search-category">
+        						<option selected="selected" value="">All Categories</option>
+        						<option value="Services">Clothes</option>
+        						<option value="Price">Household</option>
+        						<option value="Business">blah</option>
+        						<option value="Professional">Professional equipment</option>
+        						<option value="Other">Other</option>
+        					</select>
+        				</div>
+        				
+        				<div class="col-md-3">
+        					<button class="btn btn-block btn-primary  "><i class="fa fa-search"></i>
+        					</button>
+        				</div>
+        			</div>
+        		</form>
+        	</div>
+        </div>
+
+    <!-- /.search-row -->
+    <div class="main-container">
+        <div class="container">
+            <div class="row">
+                <!-- this (.mobile-filter-sidebar) part will be position fixed in mobile version -->
+                <div class="col-md-3 page-sidebar">
+                    <aside>
+                        <div class="inner-box">
+                            <div class="user-panel-sidebar">
+                                <div class="collapse-box">
+                                    <h5 class="collapse-title no-border"> My Account <a class="pull-right"
+                                                                                           aria-expanded="true"  data-toggle="collapse"
+                                                                                           href="#MyClassified"><i
+                                            class="fa fa-angle-down"></i></a></h5>
+
+                                    <div id="MyClassified" class="panel-collapse collapse show">
+                                        <ul class="acc-list">
+                                            <li><a href="personalpage.html"><i class="icon-home"></i> Personal Home </a>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- /.collapse-box  -->
+                                <div class="collapse-box">
+                                    <h5 class="collapse-title"> My Items <a class="pull-right" aria-expanded="true"  data-toggle="collapse"
+                                                                          href="#MyAds"><i class="fa fa-angle-down"></i></a>
+                                    </h5>
+
+                                    <div id="MyAds" class="panel-collapse collapse show">
+                                        <ul class="acc-list">
+                                            <li class="active"><a href="my-listings.html"><i class="icon-docs"></i> My
+                                                Listings <span class="badge badge-secondary"></span> </a></li>
+                                            <li><a href="watchlist.html"><i class="icon-heart"></i>
+                                                Watchlist <span class="badge badge-secondary"></span> </a></li>
+                                            <li><a href="bids-purchases.html"><i class="icon-hourglass"></i>
+                                                Bids / Purchases <span class="badge badge-secondary"></span> </a></li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- /.collapse-box  -->
+                                <div class="collapse-box">
+                                    <h5 class="collapse-title"> Terminate Account <a class="pull-right"
+                                                                                     aria-expanded="true"  data-toggle="collapse"
+                                                                                     href="#TerminateAccount"><i
+                                            class="fa fa-angle-down"></i></a></h5>
+
+                                    <div id="TerminateAccount" class="panel-collapse collapse show">
+                                        <ul class="acc-list">
+                                            <li><a href="account-close.html"><i class="icon-cancel-circled "></i> Close
+                                                account </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- /.collapse-box  -->
+                            </div>
+                        </div>
+                        <!-- /.inner-box  -->
+
+                    </aside>
+                </div>
+                <!--/.page-side-bar-->
+                <div class="col-md-9 page-content col-thin-left">
+                    <div class="category-list">
+                        <div class="tab-box ">
+
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs add-tabs" id="ajaxTabs" role="tablist">
+                                <li class="active nav-item">
+                                    <a  class="nav-link" href="ajax/1.html" data-url="ajax/1.html" role="tab"
+                                                      data-toggle="tab">All Ads <span class="badge badge-secondary">numAdds</span></a>
+                                </li>
+                                
+                            </ul>
+
+
+                            <div class="tab-filter">
+                                <select class="selectpicker select-sort-by" data-style="btn-select" data-width="auto">
+                                    <option>Sort by </option>
+                                    <option>Price: Low to High</option>
+                                    <option>Price: High to Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--/.tab-box-->
+
+                       
+                        <!--/.listing-filter-->
+
+
+                        
+ <div class="inner-box">
+                        
+
+                        <div class="table-responsive">
+                            <div class="table-action">
+
+                                <div class="table-search pull-right col-sm-7">
+                                    <div class="form-group"><div class="row">
+                                        
+
+                                       
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="addManageTable"
+                                   class="table table-striped table-bordered add-manage-table table demo"
+                                   data-filter="#filter" data-filter-text-only="true">
+                                <thead>
+                                <tr>
+                                    <th> Photo</th>
+                                    <th data-sort-ignore="true"> Item Details</th>
+                                    <th data-type="numeric"> Winning Bid</th>
+                                    <th> Seller</th>
+                                    <th data-type="numeric"> Options</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td style="width:14%" class="add-img-td"><a href="ads-details.html"><img
+                                            class="thumbnail  img-responsive"
+                                            src="images/item/FreeGreatPicture.com-46407-nexus-4-starts-at-199.jpg"
+                                            alt="img"></a></td>
+                                    <td style="width:40%" class="ads-details-td">
+                                        <div>
+                                            <p><strong> <a href="ads-details.html"
+                                                           title="Google drops price of Nexus 4 smartphone">Google drops
+                                                price of Nexus 4 smartphone </a> </strong></p>
+
+                                            <p><strong> Start Date </strong>:
+                                                02-Oct-2014, 04:38 PM </p>
+                                            <p><strong> End Date </strong>:
+                                                02-Oct-2014, 04:38 PM </p>
+                                            <p><strong> Type </strong>:
+                                                Auction </p>
+
+                                            
+                                        </div>
+                                    </td>
+                                    <td style="width:16%" class="price-td">
+                                        <div><p><strong> $464</strong></p>
+                                             <p><strong><a href="#">Caroline</a></strong></p>
+                                        </div>
+                                    </td>
+
+                                    <td style="width:16%" class="action-td">
+                                        <div>
+                                            <p><strong><a href="#">Joe Bloggs</a></strong>
+                                            </p>
+                                        </div>
+                                    </td>
+
+                                    <td style="width:10%" class="action-td">
+                                        <div>
+                                            <p><a class="btn btn-danger btn-sm"> <i class=" fa fa-trash"></i> Remove
+                                            </a></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width:14%" class="add-img-td"><a href="ads-details.html"><img
+                                            class="thumbnail  img-responsive"
+                                            src="images/item/FreeGreatPicture.com-46403-google-drops-nexus-4-price-now-starts-at-199-on-play-store.jpg"
+                                            alt="img"></a></td>
+                                    <td style="width:40%" class="ads-details-td">
+                                        <div>
+                                            <p><strong> <a href="ads-details.html"
+                                                           title="Google drops price of Nexus 4 smartphone">Google drops
+                                                price of Nexus 4 smartphone </a> </strong></p>
+
+                                            <p><strong> Start Date </strong>:
+                                                02-Oct-2014, 04:38 PM </p>
+                                            <p><strong> End Date </strong>:
+                                                02-Oct-2014, 04:38 PM </p>
+                                            <p><strong> Type </strong>:
+                                                Buy it now </p>
+
+                                            
+                                        </div>
+                                    </td>
+                                    <td style="width:16%" class="price-td">
+                                        <div><p><strong> $464</strong></p>
+                                              <p><strong><a href="#">Caroline</a></strong></p>
+
+                                        </div>
+                                    </td>
+
+                                    <td style="width:16%" class="action-td">
+                                        <div>
+                                            <p><strong><a href="#">Joe Bloggs</a></strong>
+                                            </p>
+                                        </div>
+                                    </td>
+
+                                    <td style="width:10%" class="action-td">
+                                        <div>
+                                            <p><a class="btn btn-danger btn-sm"> <i class=" fa fa-trash"></i> Remove
+                                            </a></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!--/.row-box End-->
+
+                    </div>
+
+                      
+                    </div>
+                 
+                    <!--/.pagination-bar -->
+
+
+                </div>
+                <!--/.page-content-->
+
+            </div>
+        </div>
+    </div>
+    <!-- /.main-container -->
+
+
+
+
+
+
+
+<!-- Le javascript
+================================================== -->
+
+<!-- Placed at the end of the document so the pages load faster -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="assets/js/vendors.min.js"></script>
+
+<!-- include custom script for site  -->
+<script src="assets/js/script.js"></script>
+
+</body>
+</html>

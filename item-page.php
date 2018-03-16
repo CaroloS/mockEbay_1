@@ -1,76 +1,3 @@
-<?php
-
-include_once('private/initialise.php');
-
-    require_login();
-
-    date_default_timezone_set("Europe/London");
-
-    $message = '';
-
-    $auctionEnded = false;
-
-    $userID= $_SESSION['id'];
-
-    $loggedInProfile = $_SESSION['description'];
-
-    $logged_in_user= $_SESSION['id'];
-
-    if (isset($_GET['saleID'])) {
-        $saleID = $_GET['saleID'];
-    } else{ 
-        if ($_SESSION('description') === 'Customer') {
-            $location = 'categoryCustomer.php';
-            header("Location: " . $location);
-            exit();
-        } else {
-            $location = 'categoryAdmin.php';
-            header("Location: " . $location);
-            exit();
-        }
-    }
-
-    $item = get_item_by_sale_id($saleID);
-
-    $buyerID = $_SESSION['buyerID'];
-
-    $highest_bid = highest_bid($saleID);
-
-    /////CHECKING IF AUCTION HAS ENDED//////
-    $auction_endDate = date('Y-m-d h:i:sa', strtotime($item['endDate']));
-    $now = date('Y-m-d h:i:sa');
-    if ($auction_endDate < $now) {
-        $auctionEnded = true;
-    }
-
-    $purchase = is_purchase_complete($saleID);
-
-    $seller = get_seller_details($saleID);
-
-    $sellerID_logged_user = $_SESSION['sellerID'];
-
-    $recommendations = get_recommendations($sellerID_logged_user);
-
-    $auctionID = get_auction_id($saleID);
-
-    $bid_mail = send_bid_mail($saleID);
-
-    $all_bids = get_all_bids($saleID);
-
-    $item_sold = item_sold($saleID);
-
-    $bids = check_bids($auctionID['auctionID']);
-
-    $headers =  'MIME-Version: 1.0' . "\r\n"; 
-    $headers .= 'From: Your name <daianabassi1@gmail.com>' . "\r\n";
-    $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n"; 
-    
-
-
-?>
-
-
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -115,156 +42,328 @@ include_once('private/initialise.php');
 
 
 <?php
+date_default_timezone_set("Europe/London");  //need to set the timezone to London 
+$message = '';
+      $db = new MySQLi('localhost', 'caroline', 'ebay123', 'MockEbay');
+      if ($db->connect_error) {
+          $message = $db->connect_error;
+      } else {
+          $message = 'Connection is OK';
+      }
+echo $message;
+  //connect to the database
+$auctionEnded = false;     //boolean to set to true when auction end date has passed
+//NEED TO GRAB THE SALE ID WHEN IT IS POSTED THROUGH
+/*if(isset($_GET['saleID'])){
+    $saleID=$_GET['saleID'];
+} */
+$userID=3;
+
+if (isset($_GET['saleID'])) {
+$saleID= $_GET['saleID'];
+} else{ $saleID=1005;}
+
+// else{
+// $saleID = 1009;
+// }
+//GETTING THE INFO/USERID OF THE SELLER OF THIS ITEM
+$query_sellerDetails = "SELECT Users.userID, firstName, lastName, SellerDetails.sellerID, saleID
+                        FROM Users 
+                        JOIN SellerDetails 
+                            ON Users.userID = SellerDetails.userID
+                        JOIN Sale
+                            ON SellerDetails.sellerID = Sale.sellerID
+                        WHERE saleID = '$saleID';";
+$result_sellerDetails = mysqli_query($db, $query_sellerDetails);
+$row8 = mysqli_fetch_array($result_sellerDetails);
+//NB - NEED TO GET THE SESSION VARIABLES OF LOGGED IN USER
+
+$loggedInProfile = "Customer";
+$logged_in_user=3;
+
+// We need to actually get this data 
 
 
+//FETCHING THE BUYER ID OF THE LOGGED IN USER
+$query_buyer = "SELECT buyerID FROM BuyerDetails WHERE userID = $logged_in_user LIMIT 1";
+$result_buyer = mysqli_query($db, $query_buyer)
+    or die('Error making select users query' . mysql_error());
+$row5 = mysqli_fetch_array($result_buyer);
+$buyerID= $row5['buyerID'];
+
+//UPDATING THE VIEWING TABLE - INCREMENT THE VIEWING FOR THIS ITEM BY 1
+$query_viewings = "UPDATE saleDescription SET viewing=viewing + 1 WHERE saleID=$saleID";
+$result_viewings = mysqli_query($db, $query_viewings);
+
+//GETTING ALL THE DETAILS FOR THE ITEM ON THIS PAGE FOR DISPLAY
+$query_itemDetails = "SELECT * FROM maintable WHERE saleID=$saleID";
+$result_itemDetails = mysqli_query($db, $query_itemDetails);
+$row1 = mysqli_fetch_array($result_itemDetails);
+
+//GETTING THE NUMBER OF PAGE VIEWS FOR THIS ITEM
+$query_getviewing = "SELECT viewing FROM saleDescription WHERE saleID=$saleID";
+$result_getviewing = mysqli_query($db, $query_getviewing);
+$row2 = mysqli_fetch_array($result_getviewing);
+
+//GETTING ALL THE BIDS ON THIS ITEM 
+$query_allBids = "SELECT * FROM allbids WHERE saleID=$saleID";
+$result_allBids = mysqli_query($db, $query_allBids);
+$row3 = mysqli_fetch_array($result_allBids);
+
+//GETTING THE USER DETAILS FOR THE PEOPLE WHO HAVE BID ON THIS SALE
+$query_bidName = "SELECT * FROM allbiddata WHERE saleID=$saleID ORDER BY bidValue DESC";
+$result_bidName = mysqli_query($db, $query_bidName);
+$row4 = mysqli_fetch_array($result_bidName);
+if ($row4) {
+    $highestBidderUserID = $row4['userID'];
+}
+
+//GETTING THE EMAIL INFO FOR ALL PEOPLE WATCHING/BUYING SALE
+$query_noDupeEmails = "SELECT * FROM nodupesemails WHERE saleID=$saleID";
+$result_noDupeEmails = mysqli_query($db, $query_noDupeEmails);
+
+/////CHECKING IF AUCTION HAS ENDED//////
+$auction_endDate = date('Y-m-d h:i:sa', strtotime($row1['endDate']));
+$now = date('Y-m-d h:i:sa');
+if ($auction_endDate < $now) {
+    $auctionEnded = true;
+}
 if ($auctionEnded) {
+    //CHECKING IF THERE IS ALREADY AN ENTRY IN THE PURCHASE TABLE FOR THIS SALE
+    $query_purchase = "SELECT * FROM Purchase WHERE saleID=$saleID";
+    $result_purchase = mysqli_query($db, $query_purchase);
+    $row6 = mysqli_fetch_array($result_purchase);
     
     //IF THERE ISN'T AN ENTRY IN THE PURCHASE TABLE - ENTER ONE IF THERE IS A BID
     //AND SEND ALL THE EMAILS TO SELLER/BIDDERS/WATCHERS TO NOTIFY OF AUCTION END/OUTCOME
-    if (!$purchase) {
-        if ($bids) {   //if there are bids on the item
+    if (!$row6) {
+        if ($row3) {   //if there are bids on the item
             
-            create_purchase($saleID, $highest_bid['buyerID'], $highest_bid['bidValue'], FALSE, FALSE);
+            $query_insertPurchase = "INSERT INTO Purchase ( saleID, buyerID, salePrice, sellerRated, buyerRated ) VALUES ( $saleID, $row4[buyerID], $row4[bidValue], FALSE, FALSE );";
+            $result_insertPurchase = mysqli_query($db, $query_insertPurchase);
             
             //send emails out to highest bidder, seller, all other bidders and watchlisters 
-            // while($buyers_emails = buyers_emails($saleID)) {   
-            //     if ($buyers_emails['sellerID'] == $item['sellerID'] ) {   
-            //             $msg = "Congratulations, your ".$item['productName']." has sold! Buyer: ".$highest_bid['firstName']." ".$highest_bid['lastName']." Winning Bid: £". $highest_bid['bidValue'];  //email to the seller
-            //     }
-            //     else if ($buyers_emails['userID'] == $highest_bid['userID'] ) {
-            //             $msg = "Congratulations, you won the auction for: ". $item['productName'] ."! Your Winning Bid: £". $highest_bid['bidValue']." Go to your account to pay.";  //email to the highest bidder
-            //     }
-            //     else {
-            //             $msg = "The auction for ". $item['productName'] ." has now ended. Winning Bid was: ". $highest_bid['bidValue'] ." We are selling similar items on edatabay, search now!";  //email to everyone else watching/bidding
-            //     }
-            //         // use wordwrap() if lines are longer than 70 characters
-            //         $msg = wordwrap($msg,70);
-            //         // send email
-            //         mail($buyers_emails['emailAddress'],"Auction Ended",$msg, $headers);
-            // }
-
-            // email_sent($saleID);
-        }
-        // else {   
-
-        //     $email_checked = check_email_sent($saleID);
-
-        //     //If final emails sent ISN'T true: 
-        //     if (!$email_checked['finalEmailsSent']) {
-
-        //         while($buyers_emails = buyers_emails($saleID)) {  
-        //             if ($buyers_emails['sellerID'] == $item['sellerID']) {   
-        //                 $msg = "We're sorry your ".$item['productName']." didn't sell this time. Relist it again now. ";  //email to the seller
-        //             }
-        //             else {
-        //                 $msg = "The auction for ". $item['productName'] ." has now ended without any bids. We are selling similar items on edatabay, search now!";  //email to everyone else watching/bidding
-        //             }
-        //             // use wordwrap() if lines are longer than 70 characters
-        //             $msg = wordwrap($msg,70);
-        //             // send email
-        //             mail($buyers_emails['emailAddress'],"Auction Ended",$msg, $headers);
-        //         }
-
-        //         email_sent($saleID);
-        //     }
-            
-        // }
-    }   
-}
-
-
-if (isset($_POST['bid'])) {
-
-        $bidValue = $_POST['bid'];
-
-
-            if ($bidValue >  $item['startPrice']) {
-                    if ($bidValue > $highest_bid['bidValue']){
-
-                        place_bid($auctionID['auctionID'], $buyerID, $bidValue);
-
-                        while($bid_mail_list = mysqli_fetch_assoc($bid_mail)){
-
-                            $bidmessage= $bid_mail_list['firstName'] ." " . $bid_mail_list['lastName']. ", \nA bid of ". $bidValue ." pounds has been made on the product: ". $item['productName'];
-                            $subject= "Bid on ". $item['productName'];
-                            $email= $bid_mail_list["emailAddress"];
-                            $headers =  'MIME-Version: 1.0' . "\r\n"; 
-                            $headers .= 'From: Your name <info@address.com>' . "\r\n";
-                            $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n"; 
-                            mail($email,$subject,$bidmessage, $headers); 
-                        }
-                    } else {
-
-                    }
-
-
-                    if (($bidValue <  $highest_bid['bidValue'])) {
-                            echo "<script> alert('Bid must be higher than current highest bid.');</script>";
-                    } 
-
-
-            }  else {
-                echo "<script> alert('Bid must be higher than starting price.');</script>";
+            while($row7 = mysqli_fetch_array($result_noDupeEmails)) {   
+                if ($row7['userID'] == $row8['userID'] ) {   
+                    $msg = "Congratulations, your ".$row1['productName']." has sold! Buyer: ".$row4['firstName']." ".$row4['lastName']." Winning Bid: £".$row4['bidValue'];  //email to the seller
+                }
+                else if ($row7['userID'] == $highestBidderUserID ) {
+                    $msg = "Congratulations, you won the auction for: ".$row1['productName']."! Your Winning Bid: £".$row4['bidValue']." Go to your account to pay.";  //email to the highest bidder
+                }
+                else {
+                    $msg = "The auction for ".$row1['productName']." has now ended. Winning Bid was: ".$row4['bidValue']." We are selling similar items on edatabay, search now!";  //email to everyone else watching/bidding
+                }
+                // use wordwrap() if lines are longer than 70 characters
+                $msg = wordwrap($msg,70);
+                // send email
+                mail($row7['emailAddress'],"Auction Ended",$msg);
             }
-} 
-
-
-
-if (isset($_POST['watchlist'])) {
-
-    $watchlist = $_POST['watchlist'];
-
-    if($watchlist === "added_to_watchlist"){
-
-        $auctionID = get_auction_id($saleID);
-
-        $buyItNowID = get_buy_id($saleID);
-
-                add_watchlist($saleID,$buyerID, $buyItNowID['buyItNowID'], $auctionID['auctionID']);
-
-    }
-}
-
-
-if(isset($_POST['backtolist'])) {
-
-    update_views($saleID);
-
-    unset($saleID);
-    if ($_SESSION['description'] === 'Customer') {
-        $location = 'categoryCustomer.php';
-        header("Location: " . $location);
-        exit();
-    } elseif ($_SESSION['description'] === 'Employee') {
-        $location = 'categoryAdmin.php';
-        header("Location: " . $location);
-         exit();
+            $query_emailsSent = "UPDATE Auction SET finalEmailsSent = TRUE WHERE saleID = $saleID;";
+            $result_emailsSent = mysqli_query($db, $query_emailsSent);
+        }
+        else {   //if there are no bids on the item
+            $query_checkEmailsSent = "SELECT finalEmailsSent FROM Auction WHERE saleID = $saleID;";
+            $result_checkEmailsSent = mysqli_query($db, $query_checkEmailsSent);
+            $row9 = mysqli_fetch_array($result_checkEmailsSent);
+            //If final emails sent ISN'T true: 
+            if (!$row9['finalEmailsSent']) {
+                while($row7 = mysqli_fetch_array($result_noDupeEmails)) {  
+                    if ($row7['userID'] == $row8['userID'] ) {   
+                        $msg = "We're sorry your ".$row1['productName']." didn't sell this time. Relist it again now. ";  //email to the seller
+                    }
+                    else {
+                        $msg = "The auction for ".$row1['productName']." has now ended without any bids. We are selling similar items on edatabay, search now!";  //email to everyone else watching/bidding
+                    }
+                    // use wordwrap() if lines are longer than 70 characters
+                    $msg = wordwrap($msg,70);
+                    // send email
+                    mail($row7['emailAddress'],"Auction Ended",$msg);
+                }
+            $query_emailsSent = "UPDATE Auction SET finalEmailsSent = TRUE WHERE saleID = $saleID;";
+            $result_emailsSent = mysqli_query($db, $query_emailsSent);
+            }
+            
+        }
     }   
+}
+
+
+
+$sql="SELECT imageURL, productName, saleID FROM watchedsalesdata WHERE saleID <> '$saleID' AND buyerID IN 
+    (SELECT buyerID FROM watchedsalesdata WHERE saleID='$saleID'AND buyerID <> '$buyerID') ";
+$result= $db->query($sql);
+
+
+
+$sqlbuyer="SELECT buyerID from BuyerDetails WHERE userID='$userID'";
+$result_buyer= $db->query($sqlbuyer);
+while($row_buyer = $result_buyer-> fetch_assoc()){
+        $buyerID=$row_buyer["buyerID"];
+    }
+
+
+$sqlauc="SELECT auctionID from Auction WHERE saleID='$saleID'";
+$result_auc= $db->query($sqlauc);
+while($row_auc = $result_auc-> fetch_assoc()){
+        $auctionID=$row_auc["auctionID"];
+}
+
+$sqlbid="SELECT * from maintable WHERE saleID='$saleID'";
+$result_bid= $db->query($sqlbid);
+while($row_bid = $result_bid-> fetch_assoc()){
+        $highBid=$row_bid["maxbid"];
+        $saleName=$row_bid["productName"];
+    }
+
+
+if (isset($_POST['bid']))
+{
+$bid = $_POST['bid'];
+
+    if ($bid> $highBid){
+
+        $sql_add_bid= "INSERT INTO Bids (auctionID, buyerID, bidValue) VALUES ('$auctionID', '$buyerID', '$bid')";
+        if ($db->query($sql_add_bid) === TRUE) {
+        echo "<script>
+        alert('Your bid has been added.');
+        </script>";
+
+
+
+        $sql_bid_mail= "SELECT * FROM nodupesemails WHERE saleID='$saleID'";
+        $result_bid_mail= $db->query($sql_bid_mail);
+        while($row_bid_mail = $result_bid_mail-> fetch_assoc()){
+
+        $bidmessage= $row_bid_mail["firstName"] ." " .$row_bid_mail["lastName"]. ", \nA bid of ". $bid." pounds has been made on the product: ". $saleName;
+         $subject= "Bid on ". $saleName;
+         $email= $row_bid_mail["emailAddress"];
+        mail($email,$subject,$bidmessage);
+            
+        
+        }
+
+
+        }
+        
+        else{
+            echo "<script>
+        alert('didnt work.');
+        </script>";
+
+        }
+
+    }   
+        else{
+        echo "<script>
+        alert('Bid must be higher than current highest bid.');
+        </script>";
+    }
 
 }
 
-//Buy It Now Purchase
-    if(isset($_POST['buyitnow'])) {
 
-        create_purchase($saleID, $buyerID, $item['buyItNowPrice'], 0, 0);
+//GETTING THE USER DETAILS FOR THE PEOPLE WHO HAVE BID ON THIS SALE
+$query_bidName = "SELECT * FROM allbiddata WHERE saleID=$saleID ORDER BY bidValue DESC";
+$result_bidName = mysqli_query($db, $query_bidName);
+$row4 = mysqli_fetch_array($result_bidName);
+if ($row4) {
+    $highestBidderUserID = $row4['userID'];
+}
 
+
+
+if (isset($_POST['Watchlist']))
+{
+$wl=$_POST['Watchlist'];
+
+if($wl==="WL"){
+
+    $sqlWL = "SELECT * FROM watchedsalesdata WHERE saleID=$saleID";
+    $result_WL = mysqli_query($db, $sqlWL);
+    $rowWL = mysqli_fetch_array($result_WL);
+
+
+        if ($rowWL['auctionID'] != NULL){
         
 
-    }
+        $aucID=$rowWL['auctionID'];
+       
+
+        $sql_WL_auc= "INSERT INTO Watchlist ( buyerID, buyItNowID, auctionID) VALUES ('$buyerID', NULL, '$aucID')";
+        if ($db->query($sql_WL_auc) === TRUE) {
+        echo "<script>
+         alert('Item has been added to your watch list.');
+         </script>";
+            }
+        }
+
+
+        elseif ($rowWL['buyItNowID'] != NULL){
+            
+
+        $binID=$rowWL['buyItNowID'];
+        
+
+        $sql_WL_bin= "INSERT INTO Watchlist ( buyerID, buyItNowID, auctionID) VALUES ('$buyerID', '$binID', NULL)";
+        if ($db->query($sql_WL_bin) === TRUE) {
+         echo "<script>
+        alert('Item has been added to your watch list.');
+        </script>"; 
+            }   
+        }
+}
+}
+
 ?>
 
 <!-- IF LOGGED IN USER IS CUSTOMER THIS HEADER - ELSE INCLUDE ADMIN HEADER    -->
 
+        <div class="header">
+            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
+                 role="navigation">
+                <div class="container">
 
+                <div class="navbar-identity">
+
+                    <a href="categoryCustomer.php" class="navbar-brand logo logo-title">
+                    <img src="images/edatabay.png" alt="Available on the App Store">
+                    </a>
+
+                </div>
+
+                    <div class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav ml-auto navbar-right">
+                            <li class="nav-item"><a href="categoryCustomer.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
+                            </li>
+                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+
+                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
+                                <ul class="dropdown-menu user-menu dropdown-menu-right">
+                                    <li class="active dropdown-item"><a href="personalpage.html"><i class="icon-home"></i> Personal Home
+                                    </a>
+                                    </li>
+                                    <li class="dropdown-item"><a href="my-listings.php"><i class="icon-th-thumb"></i> My Listings </a>
+                                    </li>
+                                    <li class="dropdown-item"><a href="watchlist.php"><i class="icon-heart"></i> Watchlist </a>
+                                    </li>
+                                    <li class="dropdown-item"><a href="bids-purchases.php"><i class="icon-hourglass"></i> Bids / Purchases
+                                    </a>
+                                    </li>
+
+                                    <li class="dropdown-item"><a href="index.php"><i class=" icon-logout "></i> Log out </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="postadd nav-item"><a class="btn btn-block   btn-border btn-post btn-danger nav-link" href="list-items.php">List An Item</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+                <!-- /.container-fluid -->
+            </nav>
+        </div>
         <!-- /.header -->
-
-    <?php 
-        if ($_SESSION['description'] === 'Customer') {
-            include('customerHeader.php');
-        } else {
-            include('adminHeader.php');
-        }
-    ?>
         <!-- /.header -->
 
 
@@ -273,48 +372,42 @@ if(isset($_POST['backtolist'])) {
 
 <?php if ($auctionEnded) { ?>
     <div >
-        <h1 style=" margin-left: 500px;" >This auction has ended! </h2>
-    </div> 
-<?php } elseif ($item_sold) {?>
-    <div >
-        <h1 style=" margin-left: 500px;" >This item has been sold! </h2>
+        <h1 style=" margin-left: 500px;" >This Auction has ended! </h2>
     </div> 
 <?php } ?>
-
-
-
-
-
-
 
     <div   class="container">
         <div  class="row">
 
-            <form action="item-page.php?saleID=<?php echo $saleID; ?>" method="post">
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label"></label>
-                        <div class="col-sm-10" style="margin-left: 16px"><input class="btn btn-block btn-primary" style="border-radius: 0px; background-color: #CCCCCC; border-color: #CCCCCC;" type="submit" name="backtolist" value="Back to Results"></div>
-                </div>
-            </form>
+            <div  class="col-md-12">
+                <div class="pull-left backtolist"><a href="mock-ebay/sub-category-sub-location.html"> <i
+                        class="fa fa-angle-double-left"></i> Back to Results</a></div>
+            </div>
         </div>
     </div>
    
    
-    <div  <?php if($auctionEnded || $item_sold) { ?> style=" opacity: 0.3;"  <?php } ?>    class="container">
+    <div  <?php if($auctionEnded) { ?> style=" opacity: 0.3;"  <?php } ?>    class="container">
 
         <div class="row">
             <div class="col-md-9 page-content col-thin-right">
                 <div class="inner inner-box ads-details-wrapper">
-                    <h1 class="auto-heading" ><span class="auto-title left"> <?php echo $item['productName'] ?></span> </h1>
+                    <h1 class="auto-heading" ><span class="auto-title left"> <?php echo $row1['productName'] ?></span> </h1>
                                 
                     <div style="clear:both;"></div>
+
+
+
+
+
+
 
 
                     <div class="row ">
                         <div class="col-sm-12 automobile-left-col">
 
                             <div style="margin-left: 200px; " class="ads-image">
-                                    <img style="height: 300px; width: auto;" src="images/<?php echo $item['imageURL']; ?>"
+                                    <img style="height: 300px; width: auto;" src="images/<?php echo $row1['imageURL']; ?>"
                                     style="width: 300px;"/>
                             </div>
                             <!--item-image-->
@@ -330,55 +423,39 @@ if(isset($_POST['backtolist'])) {
                         <div class="row">
                             
                             <div class="col-md-12">
-                                <p id="auction-info" ><?php echo $item['productDescritpion'] ?></p>
+                                <p id="auction-info" >  <?php echo $row1['productDescritpion'] ?></p>
 
                                 <aside   class="panel panel-body panel-details">
 
                                     <ul>
 
                                         <li>
-                                            <p id="auction-info" class=" no-margin "><strong>
-                                                <?php 
-                                                    if($item['auction'] == 1) {
-                                                        echo "Starting Price";
-                                                    } else {
-                                                        echo "Buy It Now Price";
-                                                    }
-                                                ?>
-                                            </strong><span id="auction-php"> £
-                                                <?php 
-                                                    if($item['auction'] == 1) {
-                                                        echo $item['startPrice'];
-                                                    } else {
-                                                        echo $item['buyItNowPrice'];
-                                                    }
-                                                ?> 
-                                            </span></p>
+                                            <p id="auction-info" class=" no-margin "><strong>Starting Price:</strong> <span id="auction-php"> £<?php echo $row1['startPrice'] ?> </span></p>
                                         </li>
                                         
                                         <li>
-                                            <p id="auction-info" class=" no-margin "><strong>End Date:</strong><span id="auction-php"> <?php echo $item['endDate'] ?> </span> </p>
+                                            <p id="auction-info" class=" no-margin "><strong>End Date:</strong><span id="auction-php"> <?php echo $row1['endDate'] ?> </span> </p>
                                         </li>
 
                                         <li>
-                                            <p id="auction-info" class=" no-margin "><strong>Time Remaining:</strong><span id="demo"> </span> </p>
+                                            <p id="auction-info" class=" no-margin "><strong>Time Remaining:</strong>  <span id="demo"> </span> </p>
                                             
                                         </li>
                                         
                                         <li>
-                                            <p id="auction-info" class="no-margin"><strong>Category:</strong> <span id="auction-php">  <?php echo $item['categoryHierarchy1'] ?> </span></p>
+                                            <p id="auction-info" class="no-margin"><strong>Category:</strong> <span id="auction-php">  <?php echo $row1['categoryHierarchy1'] ?> </span></p>
                                         </li>
                                         
                                         <li>
-                                            <p id="auction-info" class=" no-margin "><strong>Condition:</strong> <span id="auction-php">  <?php echo $item['itemCondition'] ?> </span></p>
+                                            <p id="auction-info" class=" no-margin "><strong>Condition:</strong> <span id="auction-php">  <?php echo $row1['itemCondition'] ?> </span></p>
                                         </li>
                                         
                                         <li>
-                                            <p id="auction-info" class="no-margin"><strong>Views:</strong> <span id="auction-php">  <?php echo $item['viewing'] ?> </span> </p>
+                                            <p id="auction-info" class="no-margin"><strong>Views:</strong> <span id="auction-php">  <?php echo $row2['viewing'] ?> </span> </p>
                                         </li>
 
                                         <li>
-                                            <p id="auction-info" class="no-margin"><strong>Seller:</strong> <span id="auction-php"><?php echo $seller['firstName']." ".$seller['lastName']?>  </span> </p>
+                                            <p id="auction-info" class="no-margin"><strong>Seller:</strong> <span id="auction-php"><?php echo $row1['firstName']." ".$row1['lastName']?>  </span> </p>
                                         </li>
                                       
                                     </ul>
@@ -393,24 +470,22 @@ if(isset($_POST['backtolist'])) {
                 </div>
                 <!--/.ads-details-wrapper-->
 
-<!--AND IF LOGGED IN USER DOESN'T EQUAL THE SELLER  -->
+<form form action="item-page.php?saleID=<?php echo $saleID; ?>" method="post">
+   <input style="visibility: hidden;" type="radio" name="Watchlist" value="WL" checked>
+  <div class="col-md-3" style="margin-bottom: 20px;">
+  <input class="btn btn-block btn-primary" type="submit" value="Add to Watch List" >
+  </div>
+</form>
 
-<?php if ($loggedInProfile == "Customer" && $seller['sellerID'] !== $sellerID_logged_user)  { ?>               
 
-        <form form action="<?php echo "item-page.php?saleID=" . $saleID; ?>" method="post">
-           <input style="visibility: hidden;" type="radio" name="watchlist" value="added_to_watchlist" checked>
-          <div class="col-md-3" style="margin-bottom: 20px;">
-          <input class="btn btn-block btn-primary" type="submit" value="Add to Watch List" >
-          </div>
-        </form>
-<?php } ?>
-</div>
-</div>
-<!--/.page-content-->
+            </div>
+            </div>
+            <!--/.page-content-->
 
 
 <!--AND IF LOGGED IN USER DOESN'T EQUAL THE SELLER  -->
-<?php if ($loggedInProfile == "Customer" && $item['auction'] == 1 && $seller['sellerID'] !== $sellerID_logged_user)  { ?>
+            <?php if ($loggedInProfile == "Customer")  { ?>
+
             <div class="col-md-3  page-sidebar-right">
                 <aside>
                     <div class="card sidebar-card">
@@ -419,85 +494,61 @@ if(isset($_POST['backtolist'])) {
                             <div class="card-body text-left">
                                 <label class="col-form-label" for="formGroupExampleInput">
                                 <form action="item-page.php?saleID=<?php echo $saleID; ?>" method="post">
-                                Place Bid:</label>
+                                Place bid:</label>
 
                                 <input type="text" class="form-control" name="bid" placeholder="Bid Value">
-
+                                <br />
+                                
                                 <br>
 
-                                <div class="form-group row">
-<!--                                     <label class="col-sm-3 col-form-label"></label> -->
-
-                                    <div class="col-sm-12"><input class="btn btn-block btn-primary" type="submit" value="Submit Bid" ></div>
-                                   </div>
-
-
-                                </form>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <?php }?>
-
-<?php if ($loggedInProfile == "Customer" && $item['auction'] == 1)  { ?>
-            <div class="card sidebar-card">
-                <div class="card-header"> Watch Auction</div>
-                   <div class="card-content">
-                     <div class="card-body text-left">
-
-                            <strong>Highest Bid: <br> £<?php echo $highest_bid['bidValue'] ?>  - </strong> 
-
-
-
-                            <a href="<?php echo "personalpage.php?userID=" . $highest_bid['userID']; ?>" >
-                                <strong><?php echo $highest_bid['firstName']; echo $highest_bid['lastName']; ?></strong>
-                            </a>
-
-                        <br>
-                        <br>
-                            Previous Bids:
-                            <?php 
-                                while($previous_bids = mysqli_fetch_array($all_bids)) {   ?> 
-                                <br>
-                                    £<?php  echo $previous_bids['bidValue']; ?> - 
-
-                                    <a href="personalpage.php?userID=<?php echo $previous_bids['userID']; ?>" >
-                                        <strong><?php echo $previous_bids['firstName']; echo $previous_bids['lastName']; ?></strong>
-                                    </a>
-                            <?php } ?>
-                    </div>
-                </div>
-            </div>
-
-    <?php } ?>
-
-<?php if ($loggedInProfile == "Customer" && $item['buyItNow'] == 1 && $seller['sellerID'] !== $sellerID_logged_user)  { ?>
-            <div class="col-md-3  page-sidebar-right">
-                <aside>
-                    <div class="card sidebar-card">
-                        <div class="card-header">Buy It Now</div>
-                        <div class="card-content">
-                            <div class="card-body text-left">
-                                <form action="item-page.php?saleID=<?php echo $saleID; ?>" method="post">
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label"></label>
-                                    <div class="col-sm-6"><input class="btn btn-block btn-primary" type="submit" name="buyitnow" value="Buy It Now"></div>
+
+                                    <div class="col-sm-8"><input class="btn btn-block btn-primary" type="submit" value="Submit Bid" ></div>
                                    </div>
+
+
                                 </form>
 
                             </div>
                         </div>
                     </div>
 
-<?php } ?>
+            <?php } ?>
                     
 
 
 
 
 
+            <div class="card sidebar-card">
+                <div class="card-header"> Watch Auction</div>
+                   <div class="card-content">
+                     <div class="card-body text-left">
 
+                            <strong>Highest Bid: <br> £<?php echo $row4['bidValue'] ?>  - </strong> 
+
+
+
+                            <a href="#.php?saleID=<?php echo $row2['saleID'] ?>" >
+                                <strong><?php echo $row4['firstName']; echo $row4['lastName']; ?></strong>
+                            </a>
+
+                        <br>
+                        <br>
+                            Previous Bids:
+                            <?php 
+                                while($row4 = mysqli_fetch_array($result_bidName)) {   ?> 
+                                <br>
+                                    £<?php  echo $row4['bidValue']; ?> - 
+
+                                    <a href="#.php?saleID=<?php echo $row2['saleID'] ?>" >
+                                        <strong><?php echo $row4['firstName']; echo $row4['lastName']; ?></strong>
+                                    </a>
+                            <?php } ?>
+                    </div>
+                </div>
+            </div>
                     <!--/.categories-list-->
             </aside>
         </div>
@@ -512,7 +563,7 @@ if(isset($_POST['backtolist'])) {
 <!-- script for countdown timer -->
 <script>
 // Set the date we're counting down to
-var countDownDate = new Date("<?php echo $item['endDate'] ?>").getTime();
+var countDownDate = new Date("<?php echo $row1['endDate'] ?>").getTime();
 // Update the count down every 1 second
 var x = setInterval(function() {
     // Get todays date and time
@@ -546,36 +597,8 @@ var x = setInterval(function() {
 </script>
 <!-- /.countdown timer -->
 
-<footer class="main-footer">
-	<div class="footer-content">
-		<div class="container">
-			<div class="col-xl-12 content-box" style=" width: 58%; margin-left: 165px;">
-                 <div class="row row-featured">
 
 
-
-<?php if ($loggedInProfile == "Customer" && $seller['sellerID'] !== $sellerID_logged_user)  { ?>
-
-                     <div class="col-xl-12  box-title ">
-                        <div class="inner"><h2>Others who saved this item also liked... </h2>
-                        </div>
-                    </div>               
-
-                    <?php while($reccomendation_set = mysqli_fetch_assoc($recommendations)){ 
-                    ?>
-                         <div class="col-xl-4  box-title " style="border-right: 10px; border-left: 10px; text-align:center;">
-                             <h2><a href="item-page.php?saleID=<?php echo $reccomendation_set['saleID'] ?>"><?php echo $reccomendation_set['productName']; ?></a></h2>
-                                <img src="images/<?php echo $reccomendation_set['imageURL']; ?>">
-                        </div>
-                    <?php } ?>
-<?php } ?>  
-
-                </div>
-            </div>
-        </div>
-	</div>
-</footer>
-<!-- /.footer -->
 
 
 </div>
@@ -597,27 +620,6 @@ var x = setInterval(function() {
 <!-- include custom script for site  -->
 <script src="assets/js/script.js"></script>
 
-
-
-
-<script src="assets/js/footable.js?v=2-0-1" type="text/javascript"></script>
-<script src="assets/js/footable.filter.js?v=2-0-1" type="text/javascript"></script>
-<script type="text/javascript">
-    $(function () {
-        $('#addManageTable').footable().bind('footable_filtering', function (e) {
-            var selected = $('.filter-status').find(':selected').text();
-            if (selected && selected.length > 0) {
-                e.filter += (e.filter && e.filter.length > 0) ? ' ' + selected : selected;
-                e.clear = !e.filter;
-            }
-        });
-        $('.clear-filter').click(function (e) {
-            e.preventDefault();
-            $('.filter-status').val('');
-            $('table.demo').trigger('footable_clear_filter');
-        });
-    });
-</script>
 
 
 

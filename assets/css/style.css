@@ -4041,11 +4041,11 @@ div.login-box {
 /* USER DASHBOARD
 /* =============================================================== */
 .userImg {
-/*  border: solid 1px #ddd;
-  border-radius: 3px;*/
+  border: solid 1px #ddd;
+  border-radius: 3px;
   display: inline-block;
-/*  padding: 3px;*/
-  width: 48px; }
+  padding: 3px;
+  width: 64px; }
 
 .header-data {
   margin-top: 10px;
