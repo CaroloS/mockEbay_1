@@ -1,3 +1,12 @@
+<?php
+
+include_once('private/initialise.php');
+
+    require_login();
+
+?>
+
+
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -38,13 +47,13 @@
 <div id="wrapper">
 
 <?php
-include 'DbConnection.php';
-$logged_in_user = 3;
+
+$logged_in_user = $_SESSION['id'];
 
 //FETCHING THE BUYER ID OF THE LOGGED IN USER
 $query_buyer = "SELECT buyerID FROM BuyerDetails WHERE userID = $logged_in_user LIMIT 1";
 $result_buyer = mysqli_query($db, $query_buyer)
-    or die('Error making select users query' . mysql_error());
+    or die('Error making select users query' . mysqli_error($db));
 
 $row1 = mysqli_fetch_array($result_buyer);
 
@@ -62,7 +71,7 @@ FROM Product
 WHERE buyerID = $row1[buyerID]";
 
 $result_buyItNow = mysqli_query($db, $query_buyItNow)
-    or die('Error making select users query' . mysql_error());
+    or die('Error making select users query' . mysqli_error($db));
 
 
 //FETCHING DETAILS FOR THE BUYER'S 'AUCTION' WATCHLIST ITEMS
@@ -79,121 +88,24 @@ FROM Product
 WHERE buyerID = $row1[buyerID]";
 
 $result_Auction = mysqli_query($db, $query_Auction)
-    or die('Error making select users query' . mysql_error());
+    or die('Error making select users query' . mysqli_error($db));
 
 
 ?>
 
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-                 role="navigation">
-                <div class="container">
 
-                <div class="navbar-identity">
-
-                    <a href="categoryCustomer.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
-
-                </div>
-
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav ml-auto navbar-right">
-                            <li class="nav-item"><a href="categoryCustomer.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                            </li>
-                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-
-                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                                <ul class="dropdown-menu user-menu dropdown-menu-right">
-                                    <li class="active dropdown-item"><a href="personalpage.html"><i class="icon-home"></i> Personal Home
-                                    </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="my-listings.php"><i class="icon-th-thumb"></i> My Listings </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="watchlist.php"><i class="icon-heart"></i> Watchlist </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="bids-purchases.php"><i class="icon-hourglass"></i> Bids / Purchases
-                                    </a>
-                                    </li>
-
-                                    <li class="dropdown-item"><a href="index.php"><i class=" icon-logout "></i> Log out </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="postadd nav-item"><a class="btn btn-block   btn-border btn-post btn-danger nav-link" href="list-items.php">List An Item</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!--/.nav-collapse -->
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </div>
-        <!-- /.header -->
-        <!-- /.header -->
+    <!-- header -->
+        <?php include('customerHeader.php'); ?>
+    <!-- /.header -->
 
     <div class="main-container">
         <div class="container">
             <div class="row">
-                <div class="col-md-3 page-sidebar">
-                    <aside>
-                        <div class="inner-box">
-                            <div class="user-panel-sidebar">
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title no-border"> My Account <a class="pull-right"
-                                                                                           aria-expanded="true"  data-toggle="collapse"
-                                                                                           href="#MyClassified"><i
-                                            class="fa fa-angle-down"></i></a></h5>
+                
 
-                                    <div id="MyClassified" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="personalpage.html"><i class="icon-home"></i> Personal Home </a>
-                                            </li>
-
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> My Items <a class="pull-right" aria-expanded="true"  data-toggle="collapse"
-                                                                          href="#MyAds"><i class="fa fa-angle-down"></i></a>
-                                    </h5>
-
-                                    <div id="MyAds" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="my-listings.php"><i class="icon-docs"></i> My Listings <span
-                                                    class="badge">42</span> </a></li>
-                                            <li class="active"><a href="watchlist.php"><i
-                                                    class="icon-heart"></i> Watchlist <span class="badge badge-secondary">42</span>
-                                            </a></li>
-                                            <li><a href="bids-purchases.php"><i class="icon-hourglass"></i>
-                                                Bids / Purchases <span class="badge badge-secondary">42</span> </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> Terminate Account <a class="pull-right"
-                                                                                     aria-expanded="true"  data-toggle="collapse"
-                                                                                     href="#TerminateAccount"><i
-                                            class="fa fa-angle-down"></i></a></h5>
-
-                                    <div id="TerminateAccount" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="account-close.html"><i class="icon-cancel-circled "></i> Close
-                                                account </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                            </div>
-                        </div>
-                        <!-- /.inner-box  -->
-
-                    </aside>
-                </div>
-                <!--/.page-sidebar-->
+            <!-- page-sidebar -->
+                <?php include('userSidePanel.php'); ?>
+            <!--/.page-sidebar-->
 
                 <div class="col-md-9 page-content">
                     <div class="inner-box">

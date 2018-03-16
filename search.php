@@ -1,7 +1,11 @@
 <?php
 
+include_once('private/initialise.php');
+
+    require_login();
+
 $message='';
-$db= new mysqli('localhost','caroline','ebay123','MockEbay');
+
 
 if($db->connect_error){
     $message=$db->connect_error;
@@ -80,78 +84,13 @@ if(isset($_GET['keywords'])){
 
 
     <div id="wrapper">
-
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-            role="navigation">
-            <div class="container">
-
-                <div class="navbar-identity">
-
-
-
-                    <a href="categoryCustomer.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
-
-
-                    <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggler pull-right"
-                    type="button">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 30 30" width="30" height="30" focusable="false"><title>Menu</title><path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"/></svg>
-
-
-                </button>
-
-
-                <button
-                class="flag-menu country-flag d-block d-md-none btn btn-secondary hidden pull-right"
-                href="#select-country" data-toggle="modal"> <span class="flag-icon flag-icon-us"></span>  <span class="caret"></span>
-            </button>
-
-        </div>
-
-
-
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-left">
-
-            </ul>
-            <ul class="nav navbar-nav ml-auto navbar-right">
-                <li class="nav-item"><a href="categoryCustomer.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                </li>
-                <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-
-                    <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                    <ul
-                    class="dropdown-menu user-menu dropdown-menu-right">
-                    <li class="active dropdown-item"><a href="account-home.html"><i class="icon-home"></i> Personal Home
-
-                    </a>
-                </li>
-                <li class="dropdown-item"><a href="my-listings.php"><i class="icon-th-thumb"></i> My Listings </a>
-                </li>
-                <li class="dropdown-item"><a href="watchlist.php"><i class="icon-heart"></i> Watchlist </a>
-                </li>
-
-                <li class="dropdown-item"><a href="bids-purchases.php"><i class="icon-hourglass"></i> Bids/Purchases </a>
-                </li>
-
-                <li class="dropdown-item"><a href="index.php"><i class=" icon-logout "></i> Log out </a>
-                </li>
-            </ul>
-        </li>
-        <li class="postadd nav-item"><a class="btn btn-block   btn-border btn-post btn-danger nav-link" href="list-items.php">LIST AN ITEM</a>
-        </li>
-
-    </ul>
-</div>
-<!--/.nav-collapse -->
-</div>
-<!-- /.container-fluid -->
-</nav>
-</div>
-<!-- /.header -->
+     <?php 
+        if ($_SESSION['description'] === 'Customer') {
+            include('customerHeader.php');
+        } else {
+            include('adminHeader.php');
+        }
+     ?>
 
 <div class="search-row-wrapper" style=" padding-bottom: 0px; padding-top: 10px;" >
    <div class="container"  style=" padding-bottom: 0px; padding-top: 0px;">
@@ -214,66 +153,15 @@ if(isset($_GET['keywords'])){
 <div class="main-container">
     <div class="container">
         <div class="row">
-            <!-- this (.mobile-filter-sidebar) part will be position fixed in mobile version -->
-            <div class="col-md-3 page-sidebar">
-                <aside>
-                    <div class="inner-box">
-                        <div class="user-panel-sidebar">
-                            <div class="collapse-box">
-                                <h5 class="collapse-title no-border"> My Account <a class="pull-right"
-                                   aria-expanded="true"  data-toggle="collapse"
-                                   href="#MyClassified"><i
-                                   class="fa fa-angle-down"></i></a></h5>
-
-                                   <div id="MyClassified" class="panel-collapse collapse show">
-                                    <ul class="acc-list">
-                                        <li><a href="personalpage.html"><i class="icon-home"></i> Personal Home </a>
-                                        </li>
-
-                                    </ul>
-                                </div>
-                            </div>
-                            <!-- /.collapse-box  -->
-                            <div class="collapse-box">
-                                <h5 class="collapse-title"> My Items <a class="pull-right" aria-expanded="true"  data-toggle="collapse"
-                                  href="#MyAds"><i class="fa fa-angle-down"></i></a>
-                              </h5>
-
-                              <div id="MyAds" class="panel-collapse collapse show">
-                                <ul class="acc-list">
-                                    <li class="active"><a href="my-listings.php"><i class="icon-docs"></i> My
-                                        Listings <span class="badge badge-secondary"></span> </a></li>
-                                        <li><a href="watchlist.php"><i class="icon-heart"></i>
-                                            Watchlist <span class="badge badge-secondary"></span> </a></li>
-                                            <li><a href="bids-purchases.php"><i class="icon-hourglass"></i>
-                                                Bids / Purchases <span class="badge badge-secondary"></span> </a></li>
-
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    <!-- /.collapse-box  -->
-                                    <div class="collapse-box">
-                                        <h5 class="collapse-title"> Terminate Account <a class="pull-right"
-                                         aria-expanded="true"  data-toggle="collapse"
-                                         href="#TerminateAccount"><i
-                                         class="fa fa-angle-down"></i></a></h5>
-
-                                         <div id="TerminateAccount" class="panel-collapse collapse show">
-                                            <ul class="acc-list">
-                                                <li><a href="account-close.html"><i class="icon-cancel-circled "></i> Close
-                                                account </a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <!-- /.collapse-box  -->
-                                </div>
-                            </div>
-                            <!-- /.inner-box  -->
-
-                        </aside>
-                    </div>
-                    <!--/.page-side-bar-->
+            <!-- page-sidebar -->
+                <?php 
+                    if ($_SESSION['description'] === 'Customer') {
+                        include('userSidePanel.php');
+                    } else {
+                        include('adminSidePanel.php');
+                    }
+                 ?>
+            <!--/.page-sidebar-->
                     <div class="col-md-9 page-content col-thin-left">
                         <div class="category-list">
                             <div class="tab-box ">
@@ -295,7 +183,7 @@ if(isset($_GET['keywords'])){
 
                                 <div class="tab-filter">
 
-                                    <a href="categoryCustomer.php" class="btn btn-info" role="button" style="background-color: #16A085; color: white; margin-top: 5px; margin-right: 5px; border-color:#16A085;">Return to All Ads</a>
+                                    <a href="<?php if ($_SESSION['description'] === 'Customer') { echo "categoryCustomer.php";} else {echo "categoryAdmin.php";} ?>" class="btn btn-info" role="button" style="background-color: #16A085; color: white; margin-top: 5px; margin-right: 5px; border-color:#16A085;">Return to All Ads</a>
                                     
                                 </div>
                             </div>
@@ -463,7 +351,7 @@ if(isset($_GET['keywords'])){
 
                                                                         <td style="width:16%" class="action-td">
                                                                             <div>
-                                                                                <p><strong><a href="#"><?php echo $r->firstName ." ".$r->lastName; ?></a></strong>
+                                                                                <p><strong><a href="personalpage.php?userID=<?php echo $r->userID;; ?>"><?php echo $r->firstName ." ".$r->lastName; ?></a></strong>
                                                                                 </p>
                                                                             </div>
                                                                         </td>

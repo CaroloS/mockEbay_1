@@ -1,50 +1,20 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
-    <link rel="shortcut icon" href="assets/ico/favicon.png">
-    <title>Admin View User Purhcases</title>
-    <!-- Bootstrap core CSS -->
-    <link href="assets/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+<?php
 
-   
-    <!-- Just for debugging purposes. -->
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
+include_once('private/initialise.php');
 
-    <!-- include pace script for automatic web page progress bar  -->
-    <script>
-        paceOptions = {
-            elements: true
-        };
-    </script>
-    <script src="assets/js/pace.min.js"></script>
+    require_login();
 
+?>
 
-
-</head>
-<body>
-<div id="wrapper">
 
 <?php 
-include 'DbConnection.php';
 
 if (  isset($_GET['userID'])  ) {
 
-	$query_thisBuyer = "SELECT Users.userID, firstName, buyerID FROM Users JOIN  BuyerDetails ON BuyerDetails.userID = Users.userID WHERE Users.userID = $_GET[userID] LIMIT 1";
+    $query_thisBuyer = "SELECT Users.userID, firstName, buyerID FROM Users JOIN  BuyerDetails ON BuyerDetails.userID = Users.userID WHERE Users.userID = $_GET[userID] LIMIT 1";
     $result_thisBuyer = mysqli_query($db, $query_thisBuyer)
         or die('Error making select users query' . mysql_error());
-	$row1 = mysqli_fetch_array($result_thisBuyer);
+    $row1 = mysqli_fetch_array($result_thisBuyer);
 
     //FETCHING ITEMS THAT USER HAS BID ON - AND THE CURRENT HIGHEST BID FOR THOSE ITEMS
     $query_bids = "SELECT DISTINCT imageURL, productName, startDate, endDate, SaleDescription.saleID, sellerID, Auction.auctionID,
@@ -87,63 +57,63 @@ if (  isset($_GET['userID'])  ) {
 
 ?> 
 
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-                 role="navigation">
-                <div class="container">
 
-                <div class="navbar-identity">
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+    <title>Admin View User Purhcases</title>
+    <!-- Bootstrap core CSS -->
+    <link href="assets/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
 
-                    <a href="categoryAdmin.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
+   
+    <!-- Just for debugging purposes. -->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
 
-                </div>
+    <!-- include pace script for automatic web page progress bar  -->
+    <script>
+        paceOptions = {
+            elements: true
+        };
+    </script>
+    <script src="assets/js/pace.min.js"></script>
 
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav ml-auto navbar-right">
-                            <li class="nav-item"><a href="categoryAdmin.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                            </li>
-                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
 
-                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                                <ul class="dropdown-menu user-menu dropdown-menu-right">
-                                    <li class="active dropdown-item"><a href="personalpage.html"><i class="icon-home"></i> Personal Home
-                                    </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-users.php"><i class="icon-th-thumb"></i> All Users </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-listings.php"><i class="icon-hourglass"></i> All Listings
-                                    </a>
-                                    </li>
 
-                                    <li class="dropdown-item"><a href="index.php"><i class=" icon-logout "></i> Log out </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                    <!--/.nav-collapse -->
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </div>
-        <!-- /.header -->
+</head>
+<body>
+<div id="wrapper">
 
-    <!-- /.intro-inner -->
+    <!-- header -->
+        <?php include('adminHeader.php'); ?>
+    <!-- /.header -->
 
-    <div class="main-container inner-page">
+    <div class="main-container">
         <div class="container">
-            <div class="row clearfix">
-                <h1 class="text-center title-1"> <?php echo $row1['firstName'] ?>'s Bids & Purchases </h1>
-                <hr class="mx-auto small text-hr">
+           <div class="row clearfix">
 
-                <div style="clear:both">
-                    <hr>
-                </div>
-                <div class="col-xl-12">
-                    <div class="white-box text-center" style="min-height: 400px">
+                <!-- page-sidebar -->
+                    <?php include('adminSidePanel.php'); ?>
+                <!--/.page-sidebar-->
+
+            <div class="col-md-9 page-content" style="float: right;">
+
+                <div class="inner-box">
+
+                    <h1 class="text-center title-1"> <?php echo $row1['firstName'] ?>'s Bids & Purchases </h1>
+
                     <table id="addManageTable"
                                    class="table table-striped table-bordered add-manage-table table demo"
                                    data-filter="#filter" data-filter-text-only="true">
@@ -201,7 +171,7 @@ if (  isset($_GET['userID'])  ) {
                                         </td>
                                         <td style="width:16%" class="action-td">
                                             <div>
-                                                <p><strong><a href="personal-account.php?sellerID=<?php echo $row4['userID'] ?>"><?php echo $row4['firstName'] ?></a></strong>
+                                                <p><strong><a href="personalpage.php?userID=<?php echo $row4['userID']; ?>"><?php echo $row4['firstName'] ?></a></strong>
                                             </div>
                                         </td>
                                     </tr>
@@ -264,7 +234,7 @@ if (  isset($_GET['userID'])  ) {
                                         </td>
                                         <td style="width:16%" class="action-td">
                                             <div>
-                                                <p><strong><a href="#"><?php echo $row7['firstName']  ?></a></strong>
+                                                <p><strong><a href="personalpage.php?userID=<?php echo $row7['userID'] ?>"><?php echo $row7['firstName']  ?></a></strong>
                                                 </p>
                                             </div>
                                         </td>

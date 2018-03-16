@@ -20,7 +20,6 @@
   //if (mysqli_connect_errno($conn)) {
   //die('Failed to connect to MySQL: '.mysqli_connect_error());
 
-  confirm_db_connect();
   return $connection;
 
 /*
@@ -73,7 +72,7 @@
   }
 
   function db_disconnect($connection) {
-    if(isset($connection)) {
+    if(isset($db)) {
       mysqli_close($connection);
     }
   }

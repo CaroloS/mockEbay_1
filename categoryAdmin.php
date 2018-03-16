@@ -1,6 +1,11 @@
 <?php
+include_once('private/initialise.php');
+
+    require_login();
+
+    $userID = $_SESSION['userID'];
+
 $message='';
-$db= new mysqli('localhost','caroline','ebay123','MockEbay');
 
 if($db->connect_error){
     $message=$db->connect_error;
@@ -11,34 +16,10 @@ else{
 
     $sql2='SELECT DISTINCT categoryHierarchy1 FROM maintable';
     $result2= $db->query($sql2);
-
-
-
-    session_start();
-
-    if(isset($_GET['username'])){
-
-        $username=$_GET['username'];
-    }
-
-
-    $username = 'caroline';
-    $sql3="SELECT userID FROM Access WHERE username= '$username'";
-    $result3= $db->query($sql3);
-
-
-    while($row3 = $result3-> fetch_assoc()){
-        $userID= $row3['userID'];
-    }
-
-    $_SESSION["userID"] = $userID; //insert <?php echo $_SESSION["userID"]; when you want to use the session var
-    
     
 
-    if($db->error){
-        $message= $db->error;
-    }
 }
+
 
 ?>
 
@@ -90,53 +71,13 @@ else{
 
     <div id="wrapper">
 
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-                 role="navigation">
-                <div class="container">
-
-                <div class="navbar-identity">
-
-                    <a href="categoryAdmin.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
-
-                </div>
-
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav ml-auto navbar-right">
-                            <li class="nav-item"><a href="categoryAdmin.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                            </li>
-                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-
-                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                                <ul class="dropdown-menu user-menu dropdown-menu-right">
-                                    <li class="active dropdown-item"><a href="personalPage.html"><i class="icon-home"></i> Personal Home
-                                    </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-users.php"><i class="icon-th-thumb"></i> All Users </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-listings.php"><i class="icon-hourglass"></i> All Listings
-                                    </a>
-                                    </li>
-
-                                    <li class="dropdown-item"><a href="index.php"><i class=" icon-logout "></i> Log out </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                    <!--/.nav-collapse -->
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </div>
-        <!-- /.header -->
+    <!-- header -->
+        <?php include('adminHeader.php'); ?>
+    <!-- /.header -->
   
 <div class="search-row-wrapper" style=" padding-bottom: 0px; padding-top: 10px;" >
    <div class="container"  style=" padding-bottom: 0px; padding-top: 0px;">
-      <form action="searchadmin.php" method="GET">
+      <form action="search.php" method="GET">
          <div class="row" style=" padding-bottom: 10px; padding-top: 0px;" >
 
             <!-- /.search starts -->
@@ -157,7 +98,7 @@ else{
 
 
 
-<form action="searchadmin.php" method="GET">
+<form action="search.php" method="GET">
          <div class="row" >
 
             <!-- /.search starts -->
@@ -192,61 +133,8 @@ else{
 <div class="main-container" style=" padding-bottom: 0px; padding-top: 0px;">
     <div class="container">
         <div class="row">
-            <!-- this (.mobile-filter-sidebar) part will be position fixed in mobile version -->
-            <div class="col-md-3 page-sidebar">
-                    <aside>
-                        <div class="inner-box">
-                            <div class="user-panel-sidebar">
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title no-border"> My Account <a class="pull-right"
-                                                                                           aria-expanded="true"  data-toggle="collapse"
-                                                                                           href="#MyClassified"><i
-                                            class="fa fa-angle-down"></i></a></h5>
-
-                                    <div id="MyClassified" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="personalpage.html"><i class="icon-home"></i> Personal Home </a>
-                                            </li>
-
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> Admin Panel <a class="pull-right" aria-expanded="true"  data-toggle="collapse"
-                                                                          href="#MyAds"><i class="fa fa-angle-down"></i></a>
-                                    </h5>
-
-                                    <div id="MyAds" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="admin-all-users.php"><i class="icon-docs"></i> All Users </a></li>
-                                            <li><a href="admin-all-listings.php"><i class="icon-hourglass"></i>
-                                                All Listings </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> Terminate Account <a class="pull-right"
-                                                                                     aria-expanded="true"  data-toggle="collapse"
-                                                                                     href="#TerminateAccount"><i
-                                            class="fa fa-angle-down"></i></a></h5>
-
-                                    <div id="TerminateAccount" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="account-close.html"><i class="icon-cancel-circled "></i> Close
-                                                account </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                            </div>
-                        </div>
-                        <!-- /.inner-box  -->
-
-                    </aside>
-                </div>
+            <!-- page-sidebar -->
+                <?php include('adminSidePanel.php'); ?>
                 <!--/.page-sidebar-->
                     <div class="col-md-9 page-content col-thin-left">
                         <div class="category-list">
@@ -299,7 +187,7 @@ else{
                                     <tr>
                                         <th> Photo</th>
                                         <th data-sort-ignore="true"> Item Details</th>
-                                        <th data-type="numeric"> Description</th>
+                                        
                                         <th> Seller</th>
                                     </tr>
                                 </thead>
@@ -331,19 +219,17 @@ else{
 
                                     <tr>
                                         <tr>
-                                            <td style="width:20%" ><a href="ads-details.html"><img 
+                                            <td style="width:20%" ><a href="item-page.php?saleID=<?php echo $row['saleID'];?>"><img 
                                                 src="images/<?php echo $row['imageURL']; ?>"
                                                 style="width:180px;"
                                                 alt="img"></a></td>
                                                 <td style="width:30%" class="ads-details-td">
                                                     <div>
-                                                        <p><strong> 
+                                                    
 
-                                                            <?php echo $row['productName']; ?></strong></p>
-                                                            
-                                                            <!--      <a href="item-page.php?saleID=<?php echo $row['saleID'];?>"
-                                                            title="Add"></a> </strong></p>
-                                                             -->
+                                                                 <a href="item-page.php?saleID=<?php echo $row['saleID'];?>"
+                                                            title="Add">    <p><strong>  <?php echo $row['productName']; ?></strong></p>
+                                                            </a>
 
 
                                                             <p><strong> Time remaining: </strong>
@@ -430,19 +316,11 @@ else{
 
 
                                                                             </div>
-                                                                        </td>
-                                                                        <td style="width:16%" class="price-td">
-                                                                            <div> <a><input type="button" style="background-color: #16A085; border-color:#16A085;" class="btn btn-info" value="Delete Listing" href="google.com"></a>
-
-                                                                                <!-- <p><?php echo $row['productDescritpion']; ?> </p> -->
-
-
-                                                                            </div>
-                                                                        </td>
+                                                                     
 
                                                                         <td style="width:16%" class="action-td">
                                                                             <div>
-                                                                                <p><strong><a href="#"><?php echo $row['firstName'] ." ".$row['lastName']; ?></a></strong>
+                                                                                <p><strong><a href="personalpage.php?userID=<?php echo $row['userID']; ?>"><?php echo $row['firstName'] ." ".$row['lastName']; ?></a></strong>
                                                                                 </p>
                                                                             </div>
                                                                         </td>

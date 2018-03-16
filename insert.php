@@ -1,216 +1,60 @@
 <?php
-$servername = "localhost";
-$username = "caroline";
-$password = "ebay123";
-$dbname = "MockEbay";
-$userID=1;
-// $sellerID= $userID+2000;
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+include_once('private/initialise.php');
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-} 
+    require_login();
+
+    $logged_in_user = $_SESSION['id'];
+
+    global $db;
 
 
+    $listing = [];
 
-	$category= $_POST['categoryGroup']; 
-	$type= $_POST['saleType']; 
-	$product= $_POST['itemTitle']; 
-	$desc= $_POST['itemDesc']; 
-	$condition= $_POST['conditionGroup']; 
-	$sprice= $_POST['startPrice']; 
-	$rprice= $_POST['reservePrice']; 
-	$bprice= $_POST['binPrice']; 
-	$postage= $_POST['postagePrice']; 
-	$return= $_POST['radio2']; 
-	$sdate= $_POST['startDate']; 
-	$edate= $_POST['endDate']; 
-	$picture= $_POST['imageURL'];
+	$listing['categoryHierarchy1'] = $_POST['categoryGroup'];
+    $listing['productName'] = $_POST['itemTitle'];
+    $listing['productDescription'] = $_POST['itemDesc'];
+    $listing['userID'] = $_SESSION['id'];  
+    $listing['startDate'] = $_POST['startDate']; 
+    $listing['endDate'] = $_POST['endDate'];   
+    $listing['postageCost'] = $_POST['postagePrice'];    
+    $listing['returnsAccepted'] = $_POST['radio2']; 
+    $listing['startPrice'] = $_POST['startPrice'] ?? NULL; 
+    $listing['reservePrice'] = $_POST['reservePrice'] ?? NULL; 
+    $listing['buyItNowPrice'] = $_POST['binPrice'] ?? NULL;     
+    $listing['itemCondititon'] = $_POST['conditionGroup']; 
+    $listing['imageURL'] = $_POST['imageURL'];	
+
+    $listing['saleType'] = $_POST['saleType']; 
+
+    $sellerID = $_SESSION['sellerID'];
+
+if ($listing['saleType'] === "Auction") {
 
 
-$sqlseller = "SELECT sellerID FROM SellerDetails WHERE userID= '$userID' ";
-$res= $conn->query($sqlseller);
-while($line = $res->fetch_assoc()) {
-        $sellerID=$line["sellerID"];
+    $success = insert_auction($listing);
+
+    if ($success) {
+        echo "<script> alert('Your listing has been added.');</script>";
+    } else {
+        echo "<script> alert('Something went wrong.');</script>";
     }
-
-
-
-$sql = "INSERT INTO Sale (sellerID) VALUES ($sellerID)";
-
-if ($conn->query($sql) === TRUE) {
-    echo "New record created successfully 1";
-}
-
-$sql2='SELECT max FROM maxsaleid';
-$result= $conn->query($sql2);
-
-
-if ($result->num_rows > 0) {
-    // output data of each row
-    while($row = $result->fetch_assoc()) {
-        $saleID=$row["max"];
-    }
-    echo $saleID;
-} else {
-    echo "sale ID failed";
-}
-
-
-if ($type === "Auction"){
-	$auc=1;
-	$bin=0;
-	$sql3= "INSERT INTO Auction (saleID, startPrice, reservePrice) VALUES ('$saleID', '$sprice', '$rprice')";
-
-    if ($conn->query($sql3) === TRUE) {
-    echo "New record created successfully 2";}
-
-    $sql4="SELECT categoryID FROM Category WHERE categoryHierarchy1='$category' ";
-$result2= $conn->query($sql4);
-
-if ($result2->num_rows > 0) {
-    // output data of each row
-    while($row2 = $result2->fetch_assoc()) {
-        $catID= $row2["categoryID"];
-    }
-    echo $catID;
-} else {
-    echo "cat ID failed";
-}
-
-
-$sql5= "INSERT INTO Product (categoryID, productName, productDescritpion) VALUES ('$catID', '$product', '$desc')";
-
-if ($conn->query($sql5) === TRUE) {
-    echo "New record created successfully 3";
-}
-
-
-$sql6= "SELECT MAX(productID) AS max FROM Product ";
-$result3= $conn->query($sql6);
-
-if ($result3->num_rows > 0) {
-    // output data of each row
-    while($row3 = $result3->fetch_assoc()) {
-        $prodID= $row3["max"];
-    }
-    echo $prodID;
-} else {
-    echo "prod ID failed";
-}
-
-$sql7= "INSERT INTO itemForSale (saleID, productID, itemCondition, imageURL) VALUES ('$saleID', '$prodID', '$condition', '$picture')";
-
-if ($conn->query($sql7) === TRUE) {
-    echo "New record created successfully 4";
-}
-
-$date = new DateTime($sdate);
-$startdate= $date->format('Y-m-d H:i:s');
-$startdate2= (string)$startdate;
-echo $startdate2;
-
-$date = new DateTime($edate);
-$enddate= $date->format('Y-m-d H:i:s');
-$enddate2= (string)$enddate;
-echo $enddate2;
-
-
-
-$sql8= "INSERT INTO SaleDescription (saleID, startDate, endDate, auction, buyItNow, postageCost,returnsAccepted) VALUES('$saleID','$startdate2','$enddate2','$auc','$bin','$postage', '$ret')";
-
-if ($conn->query($sql8) === TRUE) {
-    echo "New record created successfully 5";
-}
- else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
-}
-
-
-
-	
 	
 } 
 
 
+if ($listing['saleType'] === "BuyItNow"){
 
+    $success = insert_buyitnow($listing);
 
-else{
-	$auc=0;
-	$bin=1;
-	$sql9= "INSERT INTO BuyItNow (saleID, buyItNowPrice) VALUES ('$saleID', '$bprice')";
-
-    if ($conn->query($sql9) === TRUE) {
-    echo "New record created successfully 2";}
-
-    $sql10="SELECT categoryID FROM Category WHERE categoryHierarchy1='$category' ";
-$result10= $conn->query($sql10);
-
-if ($result10->num_rows > 0) {
-    // output data of each row
-    while($row10 = $result10->fetch_assoc()) {
-        $catID= $row10["categoryID"];
+    if ($success) {
+        echo "<script> alert('Your buy it now listing has been added.');</script>";
+    } else {
+        echo "<script> alert('Something went wrong.');</script>";
     }
-    echo $catID;
-} else {
-    echo "cat ID failed";
-}
 
-
-$sql11= "INSERT INTO Product (categoryID, productName, productDescritpion) VALUES ('$catID', '$product', '$desc')";
-
-if ($conn->query($sql11) === TRUE) {
-    echo "New record created successfully 3";
-}
-
-
-$sql12= "SELECT MAX(productID) AS max FROM Product ";
-$result3= $conn->query($sql12);
-
-if ($result12->num_rows > 0) {
-    // output data of each row
-    while($row12 = $result12->fetch_assoc()) {
-        $prodID= $row12["max"];
-    }
-    echo $prodID;
-} else {
-    echo "prod ID failed";
-}
-
-$sql13= "INSERT INTO itemForSale (saleID, productID, itemCondition, imageURL) VALUES ('$saleID', '$prodID', '$condition', '$picture')";
-
-if ($conn->query($sql13) === TRUE) {
-    echo "New record created successfully 4";
-}
-
-$date = new DateTime($sdate);
-$startdate= $date->format('Y-m-d H:i:s');
-$startdate2= (string)$startdate;
-echo $startdate2;
-
-$date = new DateTime($edate);
-$enddate= $date->format('Y-m-d H:i:s');
-$enddate2= (string)$enddate;
-echo $enddate2;
-
-
-
-$sql14= "INSERT INTO SaleDescription (saleID, startDate, endDate, auction, buyItNow, postageCost,returnsAccepted) VALUES('$saleID','$startdate2','$enddate2','$auc','$bin','$postage', '$ret')";
-
-if ($conn->query($sql14) === TRUE) {
-    echo "New record created successfully 5";
-}
- else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
-}
 
 }
-
-
-
-
-
 
 		
 ?>
@@ -254,57 +98,20 @@ if ($conn->query($sql14) === TRUE) {
 <body>
 <div id="wrapper">
 
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-                 role="navigation">
-                <div class="container">
-
-                <div class="navbar-identity">
-
-                    <a href="categoryCustomer.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
-
-                </div>
-
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav ml-auto navbar-right">
-                            <li class="nav-item"><a href="categoryCustomer.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                            </li>
-                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-
-                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                                <ul class="dropdown-menu user-menu dropdown-menu-right">
-                                    <li class="active dropdown-item"><a href="personalpage.html"><i class="icon-home"></i> Personal Home
-                                    </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="my-listings.html"><i class="icon-th-thumb"></i> My Listings </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="watchlist.html"><i class="icon-heart"></i> Watchlist </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="bids-purchases.html"><i class="icon-hourglass"></i> Bids / Purchases
-                                    </a>
-                                    </li>
-
-                                    <li class="dropdown-item"><a href="login.html"><i class=" icon-logout "></i> Log out </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="postadd nav-item"><a class="btn btn-block   btn-border btn-post btn-danger nav-link" href="list-items.html">List An Item</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!--/.nav-collapse -->
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </div>
-        <!-- /.header -->
+    <!-- header -->
+        <?php include('customerHeader.php'); ?>
+    <!-- /.header -->
 
     <div class="main-container">
         <div class="container">
             <div class="row">
-                <div class="col-md-12 page-content">
+
+            <!-- page-sidebar -->
+                <?php include('userSidePanel.php'); ?>
+            <!--/.page-sidebar-->
+
+
+                <div class="col-md-9 page-content">
                     <div class="inner-box category-content">
                         <div class="row">
                             <div class="col-xl-12">

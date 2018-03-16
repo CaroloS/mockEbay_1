@@ -1,8 +1,8 @@
 <?php
 
-	ob_start(); //output buffering turned on
+	//ob_start(); //output buffering turned on
 
-	session_save_path ("C:\Temp" );
+	//session_save_path ("C:\Temp" );
 
 	session_start();
 

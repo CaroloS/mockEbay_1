@@ -1,3 +1,38 @@
+<?php
+
+include_once('private/initialise.php');
+
+    require_login();
+
+?>
+
+<?php 
+
+    if (isset($_GET['userID'])  ) {
+
+        $query_thisSeller = "SELECT Users.userID, firstName, sellerID FROM Users JOIN SellerDetails ON SellerDetails.userID = Users.userID WHERE Users.userID = $_GET[userID] LIMIT 1";
+        $result_thisSeller = mysqli_query($db, $query_thisSeller)
+            or die('Error making select users query' . mysql_error());
+        $row1 = mysqli_fetch_array($result_thisSeller);
+        
+        //FETCHING DETAILS OF ALL ITEMS SELLER IS SELLING / HAS SOLD 
+        $query_allSelling  = "SELECT imageURL, productName, startDate, endDate, viewing, auction, buyItNow, saleDescription.saleID
+        FROM Product
+            JOIN itemForSale
+                ON Product.productID = itemForSale.productID
+            JOIN SaleDescription
+                ON SaleDescription.saleID = itemForSale.saleID
+            JOIN Sale 
+                On Sale.saleID = SaleDescription.saleID
+        WHERE sellerID = $row1[sellerID]";
+
+        $result_allSelling = mysqli_query($db, $query_allSelling)
+            or die('Error making select users query' . mysql_error());
+    }
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -29,113 +64,41 @@
         };
     </script>
     <script src="assets/js/pace.min.js"></script>
-
-
-
 </head>
 <body>
-<div id="wrapper">
 
-<?php 
-include 'DbConnection.php';
-
-if (  isset($_GET['userID'])  ) {
-
-	$query_thisSeller = "SELECT Users.userID, firstName, sellerID FROM Users JOIN SellerDetails ON SellerDetails.userID = Users.userID WHERE Users.userID = $_GET[userID] LIMIT 1";
-    $result_thisSeller = mysqli_query($db, $query_thisSeller)
-        or die('Error making select users query' . mysql_error());
-	$row1 = mysqli_fetch_array($result_thisSeller);
-	
-	//FETCHING DETAILS OF ALL ITEMS SELLER IS SELLING / HAS SOLD 
-	$query_allSelling  = "SELECT imageURL, productName, startDate, endDate, viewing, auction, buyItNow, saleDescription.saleID
-	FROM Product
-		JOIN itemForSale
-			ON Product.productID = itemForSale.productID
-		JOIN SaleDescription
-			ON SaleDescription.saleID = itemForSale.saleID
-		JOIN Sale 
-			On Sale.saleID = SaleDescription.saleID
-	WHERE sellerID = $row1[sellerID]";
-
-	$result_allSelling = mysqli_query($db, $query_allSelling)
-		or die('Error making select users query' . mysql_error());
- 
-}
+<div id="wrapper"> 
 
 
-?> 
+    <!-- header -->
+        <?php include('adminHeader.php'); ?>
+    <!-- /.header -->
 
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-                 role="navigation">
-                <div class="container">
 
-                <div class="navbar-identity">
-
-                    <a href="categoryAdmin.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
-
-                </div>
-
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav ml-auto navbar-right">
-                            <li class="nav-item"><a href="categoryAdmin.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                            </li>
-                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-
-                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                                <ul class="dropdown-menu user-menu dropdown-menu-right">
-                                    <li class="active dropdown-item"><a href="personalpage.html"><i class="icon-home"></i> Personal Home
-                                    </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-users.php"><i class="icon-th-thumb"></i> All Users </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-listings.php"><i class="icon-hourglass"></i> All Listings
-                                    </a>
-                                    </li>
-
-                                    <li class="dropdown-item"><a href="index.php"><i class=" icon-logout "></i> Log out </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                    <!--/.nav-collapse -->
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </div>
-        <!-- /.header -->
-
-    <!-- /.intro-inner -->
-
-    <div class="main-container inner-page">
+    <div class="main-container">
         <div class="container">
-            <div class="row clearfix">
+           <div class="row clearfix">
+
+                <!-- page-sidebar -->
+                    <?php include('adminSidePanel.php'); ?>
+                <!--/.page-sidebar-->
+
+            <div class="col-md-9 page-content" style="float: right;">
+
+                <div class="inner-box">
+
                 <h1 class="text-center title-1"> <?php echo $row1['firstName'] ?>'s Items for Sale </h1>
-                <hr class="mx-auto small text-hr">
 
-                <div style="clear:both">
-                    <hr>
-                </div>
-                <div class="col-xl-12">
-                    <div class="white-box text-center" style="min-height: 400px">
-					<table id="addManageTable"
-                                   class="table table-striped table-bordered add-manage-table table demo"
-                                   data-filter="#filter" data-filter-text-only="true">
-                                <thead>
-                                <tr>
-                                    <th> Photo</th>
-                                    <th data-sort-ignore="true"> Lising Details</th>
-                                    <th data-type="numeric"> Sold For</th>
-                                    <th data-type="numeric"> Buyer</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-
+					<table id="addManageTable" class="table table-striped table-bordered add-manage-table table demo" data-filter="#filter" data-filter-text-only="true" >
+                        <thead>
+                            <tr>
+                                <th> Photo</th>
+                                <th data-sort-ignore="true"> Lising Details</th>
+                                <th data-type="numeric"> Sold For</th>
+                                <th data-type="numeric"> Buyer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                                 <?php 
                                 while($row2 = mysqli_fetch_array($result_allSelling)) {   
                                     
@@ -216,7 +179,7 @@ if (  isset($_GET['userID'])  ) {
                                             <div><p><strong>
                                                 
                                                 <?php if ($row3) {  ?>
-                                                    <a href='#'> <?php echo $row4['firstName'] ?>  </a></strong></p>
+                                                    <a href="personalpage.php?userID=<?php echo $row4['userID'] ?>"><?php echo $row4['firstName'] ?></a></strong></p>
 
                                                 <?php } else { ?>
                                                     <p><strong> Ongoing Sale </strong></p>
@@ -229,20 +192,18 @@ if (  isset($_GET['userID'])  ) {
 
                                 <?php ;
                                 } ?>
-
                          
-                                </tbody>
-                            </table>
-                    </div>
-                </div>
+                        </tbody>
+                    </table>
+                </div> <!--/.inner-box -->
+            </div> <!-- /.md-9 -->
+        </div> <!-- /.row -->
+        </div> <!-- /.container -->
+    </div> <!-- /.main-container -->
+</div> <!-- /.wrapper -->
 
-            </div>
-        </div>
-    </div>
-    <!-- /.main-container -->
-  
-</div>
-<!-- /.wrapper -->
+<!-- </div> -->
+
 
 <!-- Le javascript
 ================================================== -->

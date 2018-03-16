@@ -1,3 +1,10 @@
+<?php 
+include_once('private/initialise.php');
+
+    require_login();    
+
+?>
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -37,8 +44,6 @@
 <div id="wrapper">
 
 <?php
-include 'DbConnection.php';
-$logged_in_user = 5;
 
 if ( isset($_GET['deleteUserID']) ) {
 
@@ -52,131 +57,32 @@ if ( isset($_GET['deleteUserID']) ) {
 }
 
 //FETCH ALL THE USERS FROM THE DATABASE AND SOME OF THEIR DETAILS TO DISPLAY
-$query_allUsers = "SELECT Users.userID, firstName, lastName, username, emailAddress, description
-FROM Profiles
-    JOIN Users 
-    	ON Users.profileID = Profiles.profileID
-    JOIN Access
-    	ON Access.accessID = Users.accessID
-    JOIN Contact 
-    	ON Contact.contactID = Users.contactID
-    JOIN Email
-        ON Email.contactID = Contact.contactID";
+$query_allUsers = "SELECT * FROM userdetails";
 
-$result_allUsers = mysqli_query($db, $query_allUsers)
-    or die('Error making select users query' . mysql_error());
+$result = mysqli_query($db, $query_allUsers);
+        confirm_result_set($result);
+        #$user = mysqli_fetch_assoc($result);
 
 ?>
 
 
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-                 role="navigation">
-                <div class="container">
-
-                <div class="navbar-identity">
-
-                    <a href="categoryAdmin.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
-
-                </div>
-
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav ml-auto navbar-right">
-                            <li class="nav-item"><a href="categoryAdmin.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                            </li>
-                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-
-                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                                <ul class="dropdown-menu user-menu dropdown-menu-right">
-                                    <li class="active dropdown-item"><a href="personalpage.html"><i class="icon-home"></i> Personal Home
-                                    </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-users.php"><i class="icon-th-thumb"></i> All Users </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-listings.php"><i class="icon-hourglass"></i> All Listings
-                                    </a>
-                                    </li>
-
-                                    <li class="dropdown-item"><a href="login.html"><i class=" icon-logout "></i> Log out </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                    <!--/.nav-collapse -->
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </div>
-        <!-- /.header -->
+    <!-- header -->
+        <?php include('adminHeader.php'); ?>
+    <!-- /.header -->
   
-
 
     <div class="main-container">
         <div class="container">
             <div class="row">
-                <div class="col-md-3 page-sidebar">
-                    <aside>
-                        <div class="inner-box">
-                            <div class="user-panel-sidebar">
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title no-border"> My Account <a class="pull-right"
-                                                                                           aria-expanded="true"  data-toggle="collapse"
-                                                                                           href="#MyClassified"><i
-                                            class="fa fa-angle-down"></i></a></h5>
+                
+            <!-- page-sidebar -->
+                <?php include('adminSidePanel.php'); ?>
+            <!--/.page-sidebar-->
 
-                                    <div id="MyClassified" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="personalpage.html"><i class="icon-home"></i> Personal Home </a>
-                                            </li>
-
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> Admin Panel <a class="pull-right" aria-expanded="true"  data-toggle="collapse"
-                                                                          href="#MyAds"><i class="fa fa-angle-down"></i></a>
-                                    </h5>
-
-                                    <div id="MyAds" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="admin-all-users.php"><i class="icon-docs"></i> All Users </a></li>
-                                            <li><a href="admin-all-listings.php"><i class="icon-hourglass"></i>
-                                                All Listings </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> Terminate Account <a class="pull-right"
-                                                                                     aria-expanded="true"  data-toggle="collapse"
-                                                                                     href="#TerminateAccount"><i
-                                            class="fa fa-angle-down"></i></a></h5>
-
-                                    <div id="TerminateAccount" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="account-close.html"><i class="icon-cancel-circled "></i> Close
-                                                account </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                            </div>
-                        </div>
-                        <!-- /.inner-box  -->
-
-                    </aside>
-                </div>
-                <!--/.page-sidebar-->
 
                 <div class="col-md-9 page-content">
                     <div class="inner-box">
-                        <h2 class="title-2"><i class="icon-folder-close"></i> All Users </h2>
+                        <h2 class="title-2"><i class="icon-user fa"></i> All Users </h2>
 
                         <div class="table-responsive">
                             <div class="table-action">
@@ -197,32 +103,32 @@ $result_allUsers = mysqli_query($db, $query_allUsers)
                                 <tbody>
 
                                 <?php 
-                                while($row1 = mysqli_fetch_array($result_allUsers)) { 
+                                while($user = mysqli_fetch_assoc($result)) { 
 
                                     //GETTINGS ALL THE RATINGS FOR EVERY USER FROM THE RATINGS TABLE
-                                    $query_ratings = "SELECT AVG(rating) FROM Ratings WHERE receiverUserID = $row1[userID]";
+                                    $query_ratings = "SELECT AVG(rating) FROM Ratings WHERE receiverUserID = $user[userID]";
 
                                     $result_ratings = mysqli_query($db, $query_ratings)
-                                        or die('Error making select users query' . mysql_error());
+                                        or die('Error making select users query' . mysqli_error($db));
                                     $row2 = mysqli_fetch_array($result_ratings);
 
                                     $avg_rating = round ($row2['AVG(rating)']);
 
                                     ?> 
                                     <tr>
-                                        <td style="width:17%" ><a href="personal-account.php?userID=<?php echo $row1['userID'] ?>">
-                                            <p><strong> <a href="#"><?php echo $row1['username'] ?></a> </strong></p>
+                                        <td style="width:17%" ><a>
+                                            <p><strong> <a href="personalpage.php?userID=<?php echo $user['userID'] ?>"><?php echo $user['username'] ?></a> </strong></p>
                                         </td>
 
                                          <td style="width:25%">
                                             <div>
-                                                <p><strong> <?php echo $row1['firstName'] ?> <span> </span> <?php echo $row1['lastName'] ?> </strong></p>
+                                                <p><strong> <?php echo $user['firstName'] ?> <span> </span> <?php echo $user['lastName'] ?> </strong></p>
                                             </div>
                                         </td>
 
                                         <td style="width:30%">
                                             <div>
-                                                <p><strong> <?php echo $row1['emailAddress'] ?> </strong></p>
+                                                <p><strong> <?php echo $user['emailAddress'] ?> </strong></p>
                                             </div>
                                         </td>
 
@@ -238,10 +144,10 @@ $result_allUsers = mysqli_query($db, $query_allUsers)
 
                                         <td style="width:10%" class="action-td">
                                             <div>
-                                                <?php if ($row1['description'] == 'Customer') { ?>
-                                                    <p><a class="btn btn-info btn-sm" href="admin-view-userSales.php?userID=<?php echo $row1['userID'] ?>"> <i class="fa fa-mail-forward"></i> View Sales
+                                                <?php if ($user['description'] == 'Customer') { ?>
+                                                    <p><a class="btn btn-info btn-sm" href="admin-view-userSales.php?userID=<?php echo $user['userID'] ?>"> <i class="fa fa-mail-forward"></i> View Sales
                                                     </a></p>
-                                                    <p><a class="btn btn-primary btn-sm" href="admin-view-userPurchases.php?userID=<?php echo $row1['userID'] ?>"> <i class="fa fa-edit"></i> View Purchases </a>
+                                                    <p><a class="btn btn-primary btn-sm" href="admin-view-userPurchases.php?userID=<?php echo $user['userID'] ?>"> <i class="fa fa-edit"></i> View Purchases </a>
                                                     </p>
                                                 <?php } ?>
                                             </div>

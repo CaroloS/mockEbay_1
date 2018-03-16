@@ -1,3 +1,48 @@
+
+
+<?php
+
+include_once('private/initialise.php');
+
+require_login();
+
+if (isset($_POST['deletesale'])) {
+
+    #echo "<script>alert('deletesale');</script>";
+
+    $deletesaleID = $_GET['deletesaleID'];
+
+    if (!item_sold($deletesaleID)) {
+
+        $deleted_sale = delete_sale($deletesaleID);
+
+        if ($deleted_sale) {
+            echo "<script>alert('Sale has been removed.');</script> ";
+            unset($deletesaleID);
+            echo "<script>window.location.replace('admin-all-listings.php');</script> ";
+        }
+
+    } else {
+        echo "<script>alert('Sale has already been concluded and cannot be removed.');</script>";
+        unset($deletesaleID);
+        echo "<script>window.location.replace('admin-all-listings.php');</script> ";
+    }
+}
+
+//FETCHING DETAILS OF ALL ITEMS SELLER IS SELLING / HAS SOLD 
+$query_allItems  = "SELECT imageURL, productName, startDate, endDate, auction, buyItNow, saleDescription.saleID, sellerID
+FROM Product
+    JOIN itemForSale
+        ON Product.productID = itemForSale.productID
+    JOIN SaleDescription
+        ON SaleDescription.saleID = itemForSale.saleID
+    JOIN Sale 
+        On Sale.saleID = SaleDescription.saleID";
+
+$result_allItems = mysqli_query($db, $query_allItems)
+    or die('Error making select users query' . mysql_error());
+
+?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -15,14 +60,6 @@
     <link href="assets/css/style.css" rel="stylesheet">
 
    
-    <!-- Just for debugging purposes. -->
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
-
-    <!-- include pace script for automatic web page progress bar  -->
     <script>
         paceOptions = {
             elements: true
@@ -35,139 +72,28 @@
 </head>
 <body>
 <div id="wrapper">
-
-<?php
-include 'DbConnection.php';
-$logged_in_user = 5;
-
-if ( isset($_GET['deleteSaleID']) ) {
-
-    echo $_GET['deleteSaleID'];
-    /*
-    $query_deleteUser = "DELETE * FROM Users WHERE userID = $_GET[deleteSaleID]";
-
-    $result_deleteUser = mysqli_query($db, $query_deletUser)
-        or die('Error making select users query' . mysql_error());
-        */
-}
-
-//FETCHING DETAILS OF ALL ITEMS SELLER IS SELLING / HAS SOLD 
-$query_allItems  = "SELECT imageURL, productName, startDate, endDate, auction, buyItNow, saleDescription.saleID, sellerID
-FROM Product
-    JOIN itemForSale
-        ON Product.productID = itemForSale.productID
-    JOIN SaleDescription
-        ON SaleDescription.saleID = itemForSale.saleID
-    JOIN Sale 
-        On Sale.saleID = SaleDescription.saleID";
-
-$result_allItems = mysqli_query($db, $query_allItems)
-    or die('Error making select users query' . mysql_error());
-
-?>
-        <div class="header">
-            <nav class="navbar  fixed-top navbar-site navbar-light bg-light navbar-expand-md"
-                 role="navigation">
-                <div class="container">
-
-                <div class="navbar-identity">
-
-                    <a href="categoryAdmin.php" class="navbar-brand logo logo-title">
-                    <img src="images/edatabay.png" alt="Available on the App Store">
-                    </a>
-
-                </div>
-
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav ml-auto navbar-right">
-                            <li class="nav-item"><a href="categoryAdmin.php" class="nav-link"><i class="icon-th-thumb"></i> Browse Items</a>
-                            </li>
-                            <li class="dropdown no-arrow nav-item"><a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-
-                                <span>User</span> <i class="icon-user fa"></i> <i class=" icon-down-open-big fa"></i></a>
-                                <ul class="dropdown-menu user-menu dropdown-menu-right">
-                                    <li class="active dropdown-item"><a href="page.html"><i class="icon-home"></i> Personal Home
-                                    </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-users.php"><i class="icon-th-thumb"></i> All Users </a>
-                                    </li>
-                                    <li class="dropdown-item"><a href="admin-all-listings.php"><i class="icon-hourglass"></i> All Listings
-                                    </a>
-                                    </li>
-
-                                    <li class="dropdown-item"><a href="login.html"><i class=" icon-logout "></i> Log out </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                    <!--/.nav-collapse -->
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </div>
-        <!-- /.header -->
+        
+  
+    <!-- header -->
+        <?php include('adminHeader.php'); ?>
+    <!-- /.header -->
+  
   
 
 
     <div class="main-container">
         <div class="container">
             <div class="row">
-                <div class="col-md-3 page-sidebar">
-                    <aside>
-                        <div class="inner-box">
-                            <div class="user-panel-sidebar">
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title no-border"> My Account <a class="pull-right"
-                                                                                           aria-expanded="true"  data-toggle="collapse"
-                                                                                           href="#MyClassified"><i
-                                            class="fa fa-angle-down"></i></a></h5>
 
-                                    <div id="MyClassified" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="personalpage.html"><i class="icon-home"></i> Personal Home </a>
-                                            </li>
+            <!--/.page-sidebar-->
+ <?php 
+        include('adminSidePanel.php');
+ ?>
+                <!--/.page-sidebar-->
 
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> Admin Panel <a class="pull-right" aria-expanded="true"  data-toggle="collapse"
-                                                                          href="#MyAds"><i class="fa fa-angle-down"></i></a>
-                                    </h5>
 
-                                    <div id="MyAds" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="admin-all-users.php"><i class="icon-docs"></i> All Users </a></li>
-                                            <li><a href="admin-all-listings.php"><i class="icon-hourglass"></i>
-                                                All Listings </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
 
-                                <!-- /.collapse-box  -->
-                                <div class="collapse-box">
-                                    <h5 class="collapse-title"> Terminate Account <a class="pull-right"
-                                                                                     aria-expanded="true"  data-toggle="collapse"
-                                                                                     href="#TerminateAccount"><i
-                                            class="fa fa-angle-down"></i></a></h5>
 
-                                    <div id="TerminateAccount" class="panel-collapse collapse show">
-                                        <ul class="acc-list">
-                                            <li><a href="account-close.html"><i class="icon-cancel-circled "></i> Close
-                                                account </a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- /.collapse-box  -->
-                            </div>
-                        </div>
-                        <!-- /.inner-box  -->
-
-                    </aside>
-                </div>
                 <!--/.page-sidebar-->
 
                 <div class="col-md-9 page-content">
@@ -263,7 +189,7 @@ $result_allItems = mysqli_query($db, $query_allItems)
                                             <?php if ($row3) { ?>
                                                     <p><strong> £<?php echo $row3['salePrice']   ?> </strong></p>
                                                     <p><strong> Buyer: </strong></p>
-                                                    <p><strong><a href="#"> <?php echo $row4['firstName'] ?> </a></strong></p>
+                                                    <p><strong><a href="personalpage.php?userID=<?php echo $row4['userID'];?>"> <?php echo $row4['firstName'] ?> </a></strong></p>
                                             <?php } else { ?>
                                                 <p><strong> Ongoing Sale </strong></p>
                                             <?php } ?>
@@ -273,18 +199,32 @@ $result_allItems = mysqli_query($db, $query_allItems)
 
                                     <td style="width:16%" class="action-td">
                                         <div>
-                                            <p><strong><a href="#"><?php echo $row2['firstName'] ?> </a></strong>
+                                            <p><strong><a href="personalpage.php?userID=<?php echo $row2['userID']; ?>"><?php echo $row2['firstName'] ?></a></strong>
                                             </p>
                                         </div>
                                     </td>
 
-                                    <td style="width:10%" class="action-td">
-                                        <div>
-                                            <p><a class="btn btn-danger btn-sm"
-                                                  href="admin-all-listings.php?deleteSaleID=<?php echo $row1['saleID']; ?>" 
-                                                  onclick="return confirm('Are you sure you want to delete this Sale?')"> <i class=" fa fa-trash"></i> Remove
+                                    <td style="width:10%">
+                                            <div   class="container">
+                                                <div  class="row">
+
+                                                    <form action="<?php echo "admin-all-listings.php?deletesaleID=" .  $row1['saleID']; ?>" method="post">
+                                                        <div class="form-group row">
+                                                            <label class="col-sm-3 col-form-label"></label>
+                                                                <div class="col-sm-10"><input class="btn btn-danger btn-sm" type="submit" 
+                                                                    name="deletesale" value="Remove"></div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+
+
+
+<!--                                             <p><a class="btn btn-danger btn-sm"
+                                                  href="admin-all-listings.php?deletesaleID=<?php #echo $row1['saleID']; ?>"> <i class=" fa fa-trash"></i> Remove
                                             </a></p>
-                                        </div>
+ -->
                                     </td>
                                 </tr>
 
