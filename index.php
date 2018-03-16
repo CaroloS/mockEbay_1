@@ -3,9 +3,14 @@
 
     if(is_post_request()) {
 
+        /*
       $login = [];
       $login['username'] = $_POST['username'];
       $login['password'] = $_POST['password'];
+
+      $location = 'categoryCustomer.php';
+      header("Location: " . $location);
+      exit();
 
     //  $result = user_login($login);
         
@@ -25,6 +30,7 @@
       } else {
       	$errors = $result;
       }
+      */
   }
 ?>
 
@@ -120,7 +126,7 @@
                             </h2>
                         </div>
                         <div class="card-body">
-                            <form action="<?php echo "index.php"; ?>" method="post">
+                            <form action="<?php echo "categoryCustomer.php"; ?>" method="post">
                                 <div class="form-group">
                                     <label for="sender-email" class="control-label">Username: <sup>*</sup></label>
 
